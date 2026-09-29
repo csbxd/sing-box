@@ -83,6 +83,7 @@ type DialerOptions struct {
 }
 
 type AbstractDialerOptions struct {
+	ServiceDiscovery           *ServiceDiscoveryQueryOptions     `json:"sd,omitempty"`
 	BindInterface              string                            `json:"bind_interface,omitempty"`
 	Inet4BindAddress           *badoption.Addr                   `json:"inet4_bind_address,omitempty"`
 	Inet6BindAddress           *badoption.Addr                   `json:"inet6_bind_address,omitempty"`

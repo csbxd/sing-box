@@ -29,6 +29,7 @@ import (
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/protocol/direct"
 	"github.com/sagernet/sing-box/route"
+	"github.com/sagernet/sing-box/sd"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
@@ -52,6 +53,7 @@ type Box struct {
 	certificateProvider *boxCertificate.Manager
 	dnsTransport        *dns.TransportManager
 	dnsRouter           *dns.Router
+	serviceDiscovery    *sd.Manager
 	connection          *route.ConnectionManager
 	router              *route.Router
 	referenceManager    *route.ReferenceManager
@@ -108,6 +110,9 @@ func Context(
 }
 
 func New(options Options) (*Box, error) {
+	if err := sd.ValidateOptions(options.Options); err != nil {
+		return nil, err
+	}
 	createdAt := time.Now()
 	ctx := options.Context
 	if ctx == nil {
@@ -230,6 +235,17 @@ func New(options Options) (*Box, error) {
 		return nil, E.Cause(err, "initialize network manager")
 	}
 	service.MustRegister[adapter.NetworkManager](ctx, networkManager)
+	serviceDiscovery, err := sd.NewManager(ctx, logFactory.NewLogger("sd"), common.PtrValueOrDefault(options.ServiceDiscovery))
+	if err != nil {
+		return nil, E.Cause(err, "initialize service discovery")
+	}
+	serviceDiscoveryOwnedByBox := false
+	defer func() {
+		if !serviceDiscoveryOwnedByBox {
+			serviceDiscovery.Close()
+		}
+	}()
+	service.MustRegister[adapter.ServiceDiscovery](ctx, serviceDiscovery)
 	// Must register after ConnectionManager: the Apple HTTP engine's proxy bridge reads it from the context when Manager.Start resolves the default client.
 	httpClientManager := httpclient.NewManager(ctx, logFactory.NewLogger("httpclient"), options.HTTPClients, routeOptions.DefaultHTTPClient)
 	service.MustRegister[adapter.HTTPClientManager](ctx, httpClientManager)
@@ -465,6 +481,11 @@ func New(options Options) (*Box, error) {
 		})
 		timeService.TimeService = ntpService
 	}
+	scope := adapter.NewScope(ctx, logFactory.Logger())
+	// Discovery providers are constructed eagerly, so they must also be closed
+	// before startup or if startup fails before the discovery lifecycle begins.
+	scope.Add(serviceDiscovery.Close)
+	serviceDiscoveryOwnedByBox = true
 	return &Box{
 		network:             networkManager,
 		endpoint:            endpointManager,
@@ -474,6 +495,7 @@ func New(options Options) (*Box, error) {
 		service:             serviceManager,
 		certificateProvider: certificateProviderManager,
 		dnsRouter:           dnsRouter,
+		serviceDiscovery:    serviceDiscovery,
 		connection:          connectionManager,
 		router:              router,
 		referenceManager:    referenceManager,
@@ -484,7 +506,7 @@ func New(options Options) (*Box, error) {
 		logger:              logFactory.Logger(),
 		internalService:     internalServices,
 		ntpService:          ntpService,
-		scope:               adapter.NewScope(ctx, logFactory.Logger()),
+		scope:               scope,
 	}, nil
 }
 
@@ -559,6 +581,7 @@ func (s *Box) preStart() error {
 		boxComponent{"network", s.network},
 		boxComponent{"dns-transport", s.dnsTransport},
 		boxComponent{"dns-router", s.dnsRouter},
+		boxComponent{"sd", s.serviceDiscovery},
 		boxComponent{"connection", s.connection},
 		boxComponent{"router", s.router},
 		boxComponent{"outbound", s.outbound},
@@ -578,6 +601,7 @@ func (s *Box) preStart() error {
 		boxComponent{s.httpClientService.Name(), s.httpClientService},
 		boxComponent{"router", s.router},
 		boxComponent{"dns-router", s.dnsRouter},
+		boxComponent{"sd", s.serviceDiscovery},
 	)
 	if err != nil {
 		return err

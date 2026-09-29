@@ -39,6 +39,16 @@ func NewReferenceManager(ctx context.Context, logger log.ContextLogger, options 
 	if options.NTP != nil && options.NTP.Enabled && options.NTP.Detour != "" {
 		staticOutbounds = append(staticOutbounds, options.NTP.Detour)
 	}
+	if options.ServiceDiscovery != nil {
+		for _, server := range options.ServiceDiscovery.Servers {
+			if server.Detour != "" {
+				staticOutbounds = append(staticOutbounds, server.Detour)
+			}
+			if server.DomainResolver != nil && server.DomainResolver.Server != "" {
+				staticTransports = append(staticTransports, server.DomainResolver.Server)
+			}
+		}
+	}
 	for _, outboundOptions := range options.Outbounds {
 		staticTransports = appendDomainResolver(staticTransports, outboundOptions.Options)
 	}
