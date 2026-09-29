@@ -40,6 +40,9 @@ type Outbound struct {
 }
 
 func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.HysteriaOutboundOptions) (adapter.Outbound, error) {
+	if options.ServiceDiscovery != nil && len(options.ServerPorts) > 0 {
+		return nil, E.New("sd conflicts with server_ports")
+	}
 	if options.TLS == nil || !options.TLS.Enabled {
 		return nil, C.ErrTLSRequired
 	}
@@ -47,7 +50,7 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 	if err != nil {
 		return nil, err
 	}
-	outboundDialer, err := dialer.New(ctx, options.DialerOptions, options.ServerIsDomain())
+	outboundDialer, err := dialer.NewServer(ctx, options.DialerOptions, options.ServerOptions)
 	if err != nil {
 		return nil, err
 	}

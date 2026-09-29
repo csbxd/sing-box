@@ -68,7 +68,7 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 			tlsHandshakeFunc = shadowtls.DefaultTLSHandshakeFunc(options.Password, stdTLSConfig)
 		}
 	}
-	outboundDialer, err := dialer.New(ctx, options.DialerOptions, options.ServerIsDomain())
+	outboundDialer, err := dialer.NewServer(ctx, options.DialerOptions, options.ServerOptions)
 	if err != nil {
 		return nil, err
 	}
