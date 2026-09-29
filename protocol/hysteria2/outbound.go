@@ -47,6 +47,12 @@ type Outbound struct {
 }
 
 func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.Hysteria2OutboundOptions) (adapter.Outbound, error) {
+	if options.ServiceDiscovery != nil && options.Realm != nil {
+		return nil, E.New("sd conflicts with realm")
+	}
+	if options.ServiceDiscovery != nil && len(options.ServerPorts) > 0 {
+		return nil, E.New("sd conflicts with server_ports")
+	}
 	if options.TLS == nil || !options.TLS.Enabled {
 		return nil, C.ErrTLSRequired
 	}
@@ -77,10 +83,12 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 		}
 	}
 	realmSTUNServersIsDomain := options.Realm != nil && options.Realm.STUNServersIsDomain()
+	serverAddress := options.ServerOptions.Build()
 	outboundDialer, err := dialer.NewWithOptions(dialer.Options{
+		ServerAddress:    &serverAddress,
 		Context:          ctx,
 		Options:          options.DialerOptions,
-		RemoteIsDomain:   options.ServerIsDomain() || realmSTUNServersIsDomain,
+		RemoteIsDomain:   options.ServerIsDomain() && options.ServiceDiscovery == nil || realmSTUNServersIsDomain,
 		ResolverOnDetour: realmSTUNServersIsDomain,
 		NewDialer:        realmSTUNServersIsDomain,
 	})
