@@ -108,6 +108,7 @@ nav:
           - DNS Rule Action: configuration/dns/rule_action.md
           - FakeIP: configuration/dns/fakeip.md
       - NTP: configuration/ntp/index.md
+      - Service Discovery: configuration/sd.md
       - Certificate: configuration/certificate/index.md
       - Route:
           - configuration/route/index.md

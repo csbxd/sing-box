@@ -84,10 +84,12 @@ func NewClientEndpoint(ctx context.Context, router adapter.Router, logger log.Co
 	if options.HTTP3Options.InitialPacketSize == 0 {
 		options.HTTP3Options.InitialPacketSize = min(int(options.MTU)+masque.QUICPacketOverhead, math.MaxUint16)
 	}
+	serverAddress := options.ServerOptions.Build()
 	outboundDialer, err := dialer.NewWithOptions(dialer.Options{
+		ServerAddress:    &serverAddress,
 		Context:          ctx,
 		Options:          options.DialerOptions,
-		RemoteIsDomain:   options.ServerIsDomain(),
+		RemoteIsDomain:   options.ServerIsDomain() && options.ServiceDiscovery == nil,
 		ResolverOnDetour: true,
 		NewDialer:        true,
 	})
