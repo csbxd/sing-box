@@ -17,6 +17,7 @@ import (
 )
 
 type Options struct {
+	ServerAddress           *M.Socksaddr
 	Context                 context.Context
 	Options                 option.DialerOptions
 	RemoteIsDomain          bool
@@ -26,6 +27,15 @@ type Options struct {
 	DisableEmptyDirectCheck bool
 	DirectOutbound          bool
 	DefaultOutbound         bool
+}
+
+// NewServer binds optional service discovery to the node address, not auxiliary destinations.
+func NewServer(ctx context.Context, options option.DialerOptions, server option.ServerOptions) (N.Dialer, error) {
+	address := server.Build()
+	return NewWithOptions(Options{
+		Context: ctx, Options: options, ServerAddress: &address,
+		RemoteIsDomain: server.ServerIsDomain() && options.ServiceDiscovery == nil,
+	})
 }
 
 // TODO: merge with NewWithOptions
@@ -39,6 +49,15 @@ func New(ctx context.Context, options option.DialerOptions, remoteIsDomain bool)
 
 func NewWithOptions(options Options) (N.Dialer, error) {
 	dialOptions := options.Options
+	if dialOptions.ServiceDiscovery != nil {
+		if options.ServerAddress == nil {
+			return nil, E.New("sd requires a supported node dialer")
+		}
+		manager := service.FromContext[adapter.ServiceDiscovery](options.Context)
+		if manager == nil || !manager.HasServer(dialOptions.ServiceDiscovery.Server) {
+			return nil, E.New("sd server not found: ", dialOptions.ServiceDiscovery.Server)
+		}
+	}
 	var (
 		dialer N.Dialer
 		err    error
@@ -97,6 +116,12 @@ func NewWithOptions(options Options) (N.Dialer, error) {
 			dnsQueryOptions,
 			time.Duration(dialOptions.FallbackDelay),
 		)
+	}
+	if dialOptions.ServiceDiscovery != nil {
+		dialer = &serviceDiscoveryDialer{
+			dialer: dialer, manager: service.FromContext[adapter.ServiceDiscovery](options.Context),
+			server: *options.ServerAddress, options: *dialOptions.ServiceDiscovery,
+		}
 	}
 	return dialer, nil
 }
