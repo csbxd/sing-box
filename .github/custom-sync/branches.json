@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "branches": {
+    "archive": {
+      "upstream_branch": "archive",
+      "replay_commits": []
+    },
+    "ccm-ocm-improvements": {
+      "upstream_branch": "ccm-ocm-improvements",
+      "replay_commits": []
+    },
+    "cloudflared": {
+      "upstream_branch": "cloudflared",
+      "replay_commits": []
+    },
+    "copilot/improve-code-efficiency": {
+      "upstream_branch": "copilot/improve-code-efficiency",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/github.com/go-jose/go-jose/v4-4.1.4": {
+      "upstream_branch": "dependabot/go_modules/github.com/go-jose/go-jose/v4-4.1.4",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/google.golang.org/grpc-1.79.3": {
+      "upstream_branch": "dependabot/go_modules/google.golang.org/grpc-1.79.3",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/test/filippo.io/edwards25519-1.1.1": {
+      "upstream_branch": "dependabot/go_modules/test/filippo.io/edwards25519-1.1.1",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/test/github.com/docker/docker-28.0.0incompatible": {
+      "upstream_branch": "dependabot/go_modules/test/github.com/docker/docker-28.0.0incompatible",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/test/go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp-1.43.0": {
+      "upstream_branch": "dependabot/go_modules/test/go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp-1.43.0",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/test/go.opentelemetry.io/otel-1.41.0": {
+      "upstream_branch": "dependabot/go_modules/test/go.opentelemetry.io/otel-1.41.0",
+      "replay_commits": []
+    },
+    "dependabot/go_modules/test/google.golang.org/grpc-1.79.3": {
+      "upstream_branch": "dependabot/go_modules/test/google.golang.org/grpc-1.79.3",
+      "replay_commits": []
+    },
+    "dev-auto-redirect-firewalld": {
+      "upstream_branch": "dev-auto-redirect-firewalld",
+      "replay_commits": []
+    },
+    "dev-daemon": {
+      "upstream_branch": "dev-daemon",
+      "replay_commits": []
+    },
+    "dev-dns-timeout": {
+      "upstream_branch": "dev-dns-timeout",
+      "replay_commits": []
+    },
+    "dev-go124-ech": {
+      "upstream_branch": "dev-go124-ech",
+      "replay_commits": []
+    },
+    "dev-l3-route": {
+      "upstream_branch": "dev-l3-route",
+      "replay_commits": []
+    },
+    "dev-mitm": {
+      "upstream_branch": "dev-mitm",
+      "replay_commits": []
+    },
+    "dev-mitm-2": {
+      "upstream_branch": "dev-mitm-2",
+      "replay_commits": []
+    },
+    "dev-mitm-3": {
+      "upstream_branch": "dev-mitm-3",
+      "replay_commits": []
+    },
+    "dev-ndis": {
+      "upstream_branch": "dev-ndis",
+      "replay_commits": []
+    },
+    "dev-next-wip": {
+      "upstream_branch": "dev-next-wip",
+      "replay_commits": []
+    },
+    "dev-ping": {
+      "upstream_branch": "dev-ping",
+      "replay_commits": []
+    },
+    "dev-sentry-debug": {
+      "upstream_branch": "dev-sentry-debug",
+      "replay_commits": []
+    },
+    "dev-ssm-api": {
+      "upstream_branch": "dev-ssm-api",
+      "replay_commits": []
+    },
+    "dev-test-mitm": {
+      "upstream_branch": "dev-test-mitm",
+      "replay_commits": []
+    },
+    "dev-tls-fragment": {
+      "upstream_branch": "dev-tls-fragment",
+      "replay_commits": []
+    },
+    "dev-ts": {
+      "upstream_branch": "dev-ts",
+      "replay_commits": []
+    },
+    "dev-ts-relay": {
+      "upstream_branch": "dev-ts-relay",
+      "replay_commits": []
+    },
+    "dev-wifi-linux": {
+      "upstream_branch": "dev-wifi-linux",
+      "replay_commits": []
+    },
+    "docs": {
+      "upstream_branch": "docs",
+      "replay_commits": []
+    },
+    "draft-windows-auto-redirect": {
+      "upstream_branch": "draft-windows-auto-redirect",
+      "replay_commits": []
+    },
+    "fix-acme-http-tls-challenge": {
+      "upstream_branch": "fix-acme-http-tls-challenge",
+      "replay_commits": []
+    },
+    "oldstable": {
+      "upstream_branch": "oldstable",
+      "replay_commits": []
+    },
+    "renovate/dockerfile": {
+      "upstream_branch": "renovate/dockerfile",
+      "replay_commits": []
+    },
+    "renovate/github-actions": {
+      "upstream_branch": "renovate/github-actions",
+      "replay_commits": []
+    },
+    "renovate/major-github-actions": {
+      "upstream_branch": "renovate/major-github-actions",
+      "replay_commits": []
+    },
+    "revert-4376-fix-anytls-urltest-results": {
+      "upstream_branch": "revert-4376-fix-anytls-urltest-results",
+      "replay_commits": []
+    },
+    "stable": {
+      "upstream_branch": "stable",
+      "replay_commits": [
+        "cc9529990cca8510c2f14290e2c4d6950da03540",
+        "a3821e4405e74660726c5b9337181ae2c5306652"
+      ]
+    },
+    "testing": {
+      "upstream_branch": "testing",
+      "replay_commits": [
+        "98a5602deeefd47125c056a0c616e547a7ea697a",
+        "be4fdc3e20120d6021b85835eb420dfc350f50a6"
+      ]
+    },
+    "unstable": {
+      "upstream_branch": "unstable",
+      "replay_commits": []
+    },
+    "usbip": {
+      "upstream_branch": "usbip",
+      "replay_commits": []
+    },
+    "custom-dev": {
+      "upstream_branch": "testing",
+      "replay_commits": [
+        "bdfede69ea4cba6f654dd19ad90c2cb62f465be6",
+        "8eedb38da3d5a7ab6c06356210c93301ed55d733",
+        "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
+        "db2b6633159d9ee2b5753174162e22c22296a95b"
+      ]
+    }
+  }
+}

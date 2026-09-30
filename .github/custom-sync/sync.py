@@ -8,11 +8,7 @@ import subprocess
 from pathlib import Path
 
 REPO = 'csbxd/sing-box'
-BRANCH = 'custom-dev'
 CONTROL = 'maintenance/custom-sync'
-ORIGINAL_HEAD = '8eedb38da3d5a7ab6c06356210c93301ed55d733'
-ORIGINALS = ['bdfede69ea4cba6f654dd19ad90c2cb62f465be6', ORIGINAL_HEAD]
-CI_COMMITS = ['61a73e57fa2ab7407b5352b65c6843778c8b78d4', 'db2b6633159d9ee2b5753174162e22c22296a95b']
 SHA = re.compile(r'[0-9a-f]{40}\Z')
 
 
@@ -40,15 +36,46 @@ def metadata(sha, cwd):
 
 
 def validate_request(request):
-    if request.get('schema') != 1:
+    if request.get('schema') == 1:
+        targets = [dict(request, branch='custom-dev')]
+    elif request.get('schema') == 2 and isinstance(request.get('targets'), list):
+        targets = request['targets']
+    else:
         raise RuntimeError('Unsupported request schema')
-    for key in ('expected_head', 'upstream_sha'):
-        if not SHA.fullmatch(request.get(key, '')):
-            raise RuntimeError('Invalid immutable SHA: ' + key)
+    if not targets or len(targets) > 100:
+        raise RuntimeError('Expected 1..100 targets')
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', request.get('request_id', '')):
         raise RuntimeError('Invalid request_id')
-    if 'expected_tree' in request and not SHA.fullmatch(request['expected_tree']):
-        raise RuntimeError('Invalid expected tree')
+    seen = set()
+    for target in targets:
+        branch = target.get('branch')
+        if not isinstance(branch, str) or branch in seen:
+            raise RuntimeError('Invalid or duplicate target branch')
+        seen.add(branch)
+        for key in ('expected_head', 'upstream_sha'):
+            if not SHA.fullmatch(target.get(key, '')):
+                raise RuntimeError('Invalid immutable SHA: ' + key)
+        if 'expected_tree' in target and not SHA.fullmatch(target['expected_tree']):
+            raise RuntimeError('Invalid expected tree')
+    return targets
+
+
+def verify_known_history(branch, expected, state):
+    recorded = state['source_sha']
+    subprocess.run(['git', 'merge-base', '--is-ancestor', recorded, expected], check=True)
+    if fingerprint(expected) != state['source_fingerprint']:
+        raise RuntimeError('Custom source changed outside controlled replay: ' + branch)
+    if recorded == expected:
+        return
+    if branch != 'custom-dev':
+        raise RuntimeError('Unrecorded branch commits require review: ' + branch)
+    for commit in git('rev-list', recorded + '..' + expected).splitlines():
+        parents = git('rev-list', '--parents', '-n', '1', commit).split()
+        if len(parents) != 2:
+            raise RuntimeError('Unrecorded merge/root commit requires review')
+        files = git('diff-tree', '--no-commit-id', '--name-only', '-r', commit).splitlines()
+        if files != ['.github/custom-release/request.json']:
+            raise RuntimeError('Only release-request descendants may be ignored')
 
 
 def remote_head(ref):
@@ -62,72 +89,95 @@ def main():
     if os.environ['GITHUB_REPOSITORY'] != REPO or os.environ['GITHUB_REF'] != 'refs/heads/' + CONTROL:
         raise RuntimeError('Wrong repository or control branch')
     request = json.loads(Path('.github/custom-sync/request.json').read_text())
-    validate_request(request)
-    expected = request['expected_head']
-    upstream = request['upstream_sha']
-    if remote_head(BRANCH) != expected:
-        raise RuntimeError('User branch changed; refusing to overwrite it')
-    current_upstream = git('ls-remote', '--exit-code', 'https://github.com/SagerNet/sing-box.git',
-                           'refs/heads/testing').split()[0]
-    if current_upstream != upstream:
-        raise RuntimeError('Upstream moved; review and submit a fresh request')
-    git('fetch', '--no-tags', 'origin', expected, *CI_COMMITS, *ORIGINALS)
-    git('fetch', '--no-tags', 'https://github.com/SagerNet/sing-box.git', upstream)
+    targets = validate_request(request)
+    config = json.loads(Path('.github/custom-sync/branches.json').read_text())['branches']
     state_path = Path('.github/custom-sync/state.json')
-    state = json.loads(state_path.read_text()) if state_path.exists() else None
-    # Never discard unexpected user edits, even if the requester knows the new SHA.
-    accepted_fingerprint = state['source_fingerprint'] if state else fingerprint(ORIGINAL_HEAD)
-    if fingerprint(expected) != accepted_fingerprint:
-        raise RuntimeError('Custom source changed outside this sync; review new commits before replay')
-    if state and state['upstream_sha'] == upstream and state.get('ci_commits', [state.get('ci_commit')]) == CI_COMMITS:
-        print('Upstream and custom source unchanged; no rewrite or release needed')
-        Path('sync-result.json').write_text(json.dumps(dict(state, skip=True), indent=2) + '\n')
-        return
-    work = Path(os.environ['RUNNER_TEMP']) / 'custom-cherry-pick'
-    git('worktree', 'add', '--detach', str(work), upstream)
-    git('config', 'user.name', 'github-actions[bot]', cwd=work)
-    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
-    mapping = []
-    for original in ORIGINALS + CI_COMMITS:
-        git('cherry-pick', original, cwd=work)
-        replayed = git('rev-parse', 'HEAD', cwd=work)
-        if metadata(original, work) != metadata(replayed, work):
-            raise RuntimeError('Cherry-pick altered original author/date/message')
-        before, after = patch_id(original, work), patch_id(replayed, work)
-        if before != after:
-            raise RuntimeError('Cherry-pick patch differs; manual review required')
-        mapping.append({'original': original, 'cherry_pick': replayed,
-                        'patch_id': after, 'metadata_preserved': True})
-    new_head = git('rev-parse', 'HEAD', cwd=work)
-    tree = git('rev-parse', 'HEAD^{tree}', cwd=work)
-    if request.get('expected_tree') and request['expected_tree'] != tree:
-        raise RuntimeError('Final tree differs from independently audited tree')
-    if git('status', '--porcelain', cwd=work):
-        raise RuntimeError('Cherry-pick worktree is dirty')
-    result = {'schema': 1, 'skip': False, 'upstream_sha': upstream, 'ci_commits': CI_COMMITS,
-              'previous_head': expected, 'source_sha': new_head, 'source_tree': tree,
-              'source_fingerprint': fingerprint(new_head, work), 'mapping': mapping,
-              'backup_branch': 'backup/custom-dev-before-sync-' + request['request_id']}
-    print(json.dumps(result, indent=2))
-    # Publish immutable audit artifact even if a later lease rejects the write.
+    state = json.loads(state_path.read_text())
+    if state.get('schema') != 2:
+        raise RuntimeError('Branch state needs migration before any rewrite')
+    prepared = []
+    # Audit every requested target before any branch write. Unknown custom edits,
+    # unreviewed branches and conflicts fail the entire preflight closed.
+    for index, target in enumerate(targets):
+        branch = target['branch']
+        if branch not in config or branch not in state['branches']:
+            raise RuntimeError('Target has no reviewed replay policy: ' + branch)
+        policy = config[branch]
+        recorded = state['branches'][branch]
+        expected, upstream = target['expected_head'], target['upstream_sha']
+        replay = policy['replay_commits']
+        if any(not SHA.fullmatch(c) for c in replay):
+            raise RuntimeError('Replay policy has a nonimmutable commit')
+        if remote_head(branch) != expected:
+            raise RuntimeError('User branch changed: ' + branch)
+        upstream_ref = 'refs/heads/' + policy['upstream_branch']
+        advertised = git('ls-remote', '--exit-code', 'https://github.com/SagerNet/sing-box.git', upstream_ref).split()[0]
+        if advertised != upstream:
+            raise RuntimeError('Upstream moved: ' + branch)
+        git('fetch', '--no-tags', 'origin', expected, recorded['source_sha'], *replay)
+        verify_known_history(branch, expected, recorded)
+        if recorded['upstream_sha'] == upstream and recorded['replay_commits'] == replay:
+            prepared.append({'branch': branch, 'skip': True, 'source_sha': expected})
+            continue
+        git('fetch', '--no-tags', 'https://github.com/SagerNet/sing-box.git', upstream)
+        work = Path(os.environ['RUNNER_TEMP']) / ('custom-cherry-pick-' + str(index))
+        git('worktree', 'add', '--detach', str(work), upstream)
+        git('config', 'user.name', 'github-actions[bot]', cwd=work)
+        git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
+        mapping = []
+        for original in replay:
+            git('cherry-pick', original, cwd=work)
+            replayed = git('rev-parse', 'HEAD', cwd=work)
+            if metadata(original, work) != metadata(replayed, work):
+                raise RuntimeError('Cherry-pick altered original author/date/message')
+            before, after = patch_id(original, work), patch_id(replayed, work)
+            if before != after:
+                raise RuntimeError('Cherry-pick patch differs; manual review required')
+            mapping.append({'original': original, 'cherry_pick': replayed,
+                            'patch_id': after, 'metadata_preserved': True})
+        new_head = git('rev-parse', 'HEAD', cwd=work)
+        tree = git('rev-parse', 'HEAD^{tree}', cwd=work)
+        if target.get('expected_tree') and target['expected_tree'] != tree:
+            raise RuntimeError('Final tree differs from independently audited tree')
+        if git('status', '--porcelain', cwd=work):
+            raise RuntimeError('Cherry-pick worktree is dirty')
+        record = {'branch': branch, 'skip': False, 'upstream_sha': upstream,
+                  'replay_commits': replay, 'previous_head': expected,
+                  'source_sha': new_head, 'source_tree': tree,
+                  'source_fingerprint': fingerprint(new_head, work), 'mapping': mapping,
+                  'backup_branch': 'backup/sync-' + request['request_id'] + '/' + branch}
+        prepared.append(record)
+    result = {'schema': 2, 'targets': prepared, 'applied': []}
     Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
-    if remote_head(BRANCH) != expected:
-        raise RuntimeError('Branch changed during audit; no ref update made')
-    backup = result['backup_branch']
-    if git('ls-remote', '--heads', 'origin', 'refs/heads/' + backup):
-        raise RuntimeError('Backup branch already exists; never replace it')
-    git('push', 'origin', expected + ':refs/heads/' + backup)
-    # The lease is evaluated atomically by GitHub, unlike a read-then-force API call.
-    git('push', '--force-with-lease=refs/heads/' + BRANCH + ':' + expected,
-        'origin', new_head + ':refs/heads/' + BRANCH, cwd=work)
-    if remote_head(BRANCH) != new_head:
-        raise RuntimeError('Remote verification failed')
-    state_path.write_text(json.dumps(result, indent=2) + '\n')
-    git('config', 'user.name', 'github-actions[bot]')
-    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
-    git('add', str(state_path))
-    git('commit', '-m', 'Record verified cherry-pick sync result')
-    git('push', 'origin', 'HEAD:refs/heads/' + CONTROL)
+    print(json.dumps(result, indent=2))
+    try:
+        for record in prepared:
+            if record['skip']:
+                print('Unchanged; no rewrite needed: ' + record['branch'])
+                continue
+            branch, expected = record['branch'], record['previous_head']
+            if remote_head(branch) != expected:
+                raise RuntimeError('Branch changed during audit; no overwrite: ' + branch)
+            backup = record['backup_branch']
+            if git('ls-remote', '--heads', 'origin', 'refs/heads/' + backup):
+                raise RuntimeError('Backup branch already exists; never replace it')
+            git('push', 'origin', expected + ':refs/heads/' + backup)
+            git('push', '--force-with-lease=refs/heads/' + branch + ':' + expected,
+                'origin', record['source_sha'] + ':refs/heads/' + branch)
+            if remote_head(branch) != record['source_sha']:
+                raise RuntimeError('Remote verification failed: ' + branch)
+            state['branches'][branch] = record
+            result['applied'].append(branch)
+            Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
+    finally:
+        # Persist successful targets even if a later target's lease rejects a write.
+        if result['applied']:
+            state_path.write_text(json.dumps(state, indent=2) + '\n')
+            git('config', 'user.name', 'github-actions[bot]')
+            git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
+            git('add', str(state_path))
+            git('commit', '-m', 'Record verified branch replay sync results')
+            git('push', 'origin', 'HEAD:refs/heads/' + CONTROL)
 
 
 if __name__ == '__main__':

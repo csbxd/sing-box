@@ -1,6 +1,216 @@
 {
-  "schema": 1,
-  "request_id": "verify-unchanged-20260930",
-  "expected_head": "b55b62b476a2cc48414dc9db6b0b41cc4a7e154d",
-  "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2"
+  "schema": 2,
+  "request_id": "verify-all-core-branches-20260930",
+  "targets": [
+    {
+      "branch": "archive",
+      "expected_head": "2e4eb9aa3952639314ca155adad49b650bcde460",
+      "upstream_sha": "2e4eb9aa3952639314ca155adad49b650bcde460"
+    },
+    {
+      "branch": "ccm-ocm-improvements",
+      "expected_head": "db8b42c107c16164ccea885ac7283d23112512d0",
+      "upstream_sha": "db8b42c107c16164ccea885ac7283d23112512d0"
+    },
+    {
+      "branch": "cloudflared",
+      "expected_head": "1f1ba549fd971bd20eb3edf1ab9664c99d0335b0",
+      "upstream_sha": "1f1ba549fd971bd20eb3edf1ab9664c99d0335b0"
+    },
+    {
+      "branch": "copilot/improve-code-efficiency",
+      "expected_head": "dfb4ef2deb364cbc88a25aa3567c38ce7694ef58",
+      "upstream_sha": "dfb4ef2deb364cbc88a25aa3567c38ce7694ef58"
+    },
+    {
+      "branch": "dependabot/go_modules/github.com/go-jose/go-jose/v4-4.1.4",
+      "expected_head": "2780400fe79b8ad5cdc7dd8283804da3ccf61ab4",
+      "upstream_sha": "2780400fe79b8ad5cdc7dd8283804da3ccf61ab4"
+    },
+    {
+      "branch": "dependabot/go_modules/google.golang.org/grpc-1.79.3",
+      "expected_head": "76273a3c6df5316cd3e1f2caf6cef903528083ab",
+      "upstream_sha": "76273a3c6df5316cd3e1f2caf6cef903528083ab"
+    },
+    {
+      "branch": "dependabot/go_modules/test/filippo.io/edwards25519-1.1.1",
+      "expected_head": "84986688f3fff35947b14744fb304ed7a01e5f0b",
+      "upstream_sha": "84986688f3fff35947b14744fb304ed7a01e5f0b"
+    },
+    {
+      "branch": "dependabot/go_modules/test/github.com/docker/docker-28.0.0incompatible",
+      "expected_head": "d82be7d86bf4a3362394f544a221e36e14abba4a",
+      "upstream_sha": "d82be7d86bf4a3362394f544a221e36e14abba4a"
+    },
+    {
+      "branch": "dependabot/go_modules/test/go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp-1.43.0",
+      "expected_head": "ece8a0b062f013a675e3c9117f389edcbf49a4c6",
+      "upstream_sha": "ece8a0b062f013a675e3c9117f389edcbf49a4c6"
+    },
+    {
+      "branch": "dependabot/go_modules/test/go.opentelemetry.io/otel-1.41.0",
+      "expected_head": "010b1e74a3c2c4aa8eeedd1604ec2a04420967e9",
+      "upstream_sha": "010b1e74a3c2c4aa8eeedd1604ec2a04420967e9"
+    },
+    {
+      "branch": "dependabot/go_modules/test/google.golang.org/grpc-1.79.3",
+      "expected_head": "096669d0ac0e9646531a52f59dc04f9de93979b1",
+      "upstream_sha": "096669d0ac0e9646531a52f59dc04f9de93979b1"
+    },
+    {
+      "branch": "dev-auto-redirect-firewalld",
+      "expected_head": "1974c767c95f5ffb69e0a1e6dcbcc6d211860da9",
+      "upstream_sha": "1974c767c95f5ffb69e0a1e6dcbcc6d211860da9"
+    },
+    {
+      "branch": "dev-daemon",
+      "expected_head": "f48f8c5d1cf26b88ceec64bf416b15674f46c4e8",
+      "upstream_sha": "f48f8c5d1cf26b88ceec64bf416b15674f46c4e8"
+    },
+    {
+      "branch": "dev-dns-timeout",
+      "expected_head": "0d8c15932fd92547dc8fbd8b3611053ed67582be",
+      "upstream_sha": "0d8c15932fd92547dc8fbd8b3611053ed67582be"
+    },
+    {
+      "branch": "dev-go124-ech",
+      "expected_head": "658d4a180b939a934117f80e6ce31661fbc80c0a",
+      "upstream_sha": "658d4a180b939a934117f80e6ce31661fbc80c0a"
+    },
+    {
+      "branch": "dev-l3-route",
+      "expected_head": "9092139e735ebb7d98368589a29a9f416d632fba",
+      "upstream_sha": "9092139e735ebb7d98368589a29a9f416d632fba"
+    },
+    {
+      "branch": "dev-mitm",
+      "expected_head": "003423745ebd1e038a4be796dcd55e4a42ffc562",
+      "upstream_sha": "003423745ebd1e038a4be796dcd55e4a42ffc562"
+    },
+    {
+      "branch": "dev-mitm-2",
+      "expected_head": "5cca8893c9a351a1834b03b891cb46ff00d1e5e3",
+      "upstream_sha": "5cca8893c9a351a1834b03b891cb46ff00d1e5e3"
+    },
+    {
+      "branch": "dev-mitm-3",
+      "expected_head": "29bdf47e44830d4346b167bc952a39946f1696c1",
+      "upstream_sha": "29bdf47e44830d4346b167bc952a39946f1696c1"
+    },
+    {
+      "branch": "dev-ndis",
+      "expected_head": "79d3649a8b2dc20de469ad0896569c70ea242aa4",
+      "upstream_sha": "79d3649a8b2dc20de469ad0896569c70ea242aa4"
+    },
+    {
+      "branch": "dev-next-wip",
+      "expected_head": "47736b27ba624f59690d4e455cb4a7f9b104d83a",
+      "upstream_sha": "47736b27ba624f59690d4e455cb4a7f9b104d83a"
+    },
+    {
+      "branch": "dev-ping",
+      "expected_head": "00870d2833e902065ed2279f5d5885a4670813a3",
+      "upstream_sha": "00870d2833e902065ed2279f5d5885a4670813a3"
+    },
+    {
+      "branch": "dev-sentry-debug",
+      "expected_head": "05b4d9885241bc9fe58d01c9513bb05c8fb4c33d",
+      "upstream_sha": "05b4d9885241bc9fe58d01c9513bb05c8fb4c33d"
+    },
+    {
+      "branch": "dev-ssm-api",
+      "expected_head": "d34091f8fc7ca691ecd2e1426a0f6b6a58138635",
+      "upstream_sha": "d34091f8fc7ca691ecd2e1426a0f6b6a58138635"
+    },
+    {
+      "branch": "dev-test-mitm",
+      "expected_head": "1189d880489e00b0da5523d11aadd96d91dc3e46",
+      "upstream_sha": "1189d880489e00b0da5523d11aadd96d91dc3e46"
+    },
+    {
+      "branch": "dev-tls-fragment",
+      "expected_head": "420d8d144a3f1bc42735ee5a2b72869fc2abfa77",
+      "upstream_sha": "420d8d144a3f1bc42735ee5a2b72869fc2abfa77"
+    },
+    {
+      "branch": "dev-ts",
+      "expected_head": "bbcd4cf31287381104ea4450e303a8c23664abff",
+      "upstream_sha": "bbcd4cf31287381104ea4450e303a8c23664abff"
+    },
+    {
+      "branch": "dev-ts-relay",
+      "expected_head": "4637f8182d96da5e96d6f62c8c78467123b053bd",
+      "upstream_sha": "4637f8182d96da5e96d6f62c8c78467123b053bd"
+    },
+    {
+      "branch": "dev-wifi-linux",
+      "expected_head": "766972ce528d93dc53403fc8eb363f7e259ef813",
+      "upstream_sha": "766972ce528d93dc53403fc8eb363f7e259ef813"
+    },
+    {
+      "branch": "docs",
+      "expected_head": "cbe83acdc5845fcb8fb1bce44c96f9c227ead098",
+      "upstream_sha": "cbe83acdc5845fcb8fb1bce44c96f9c227ead098"
+    },
+    {
+      "branch": "draft-windows-auto-redirect",
+      "expected_head": "b1b6bf07ae7c9166bb4fd732ac9bc0a24991efde",
+      "upstream_sha": "b1b6bf07ae7c9166bb4fd732ac9bc0a24991efde"
+    },
+    {
+      "branch": "fix-acme-http-tls-challenge",
+      "expected_head": "86c44a3e126ec3a5dc95ff7a95e4dc2da3b56eee",
+      "upstream_sha": "86c44a3e126ec3a5dc95ff7a95e4dc2da3b56eee"
+    },
+    {
+      "branch": "oldstable",
+      "expected_head": "78d3eeedacdda487eca7f2793e29973cb2f8a86c",
+      "upstream_sha": "78d3eeedacdda487eca7f2793e29973cb2f8a86c"
+    },
+    {
+      "branch": "renovate/dockerfile",
+      "expected_head": "90b379966c6c9341b5a583d485839865b54c6427",
+      "upstream_sha": "90b379966c6c9341b5a583d485839865b54c6427"
+    },
+    {
+      "branch": "renovate/github-actions",
+      "expected_head": "ecf633af50fe41ddf569fa914923863f6a09f840",
+      "upstream_sha": "ecf633af50fe41ddf569fa914923863f6a09f840"
+    },
+    {
+      "branch": "renovate/major-github-actions",
+      "expected_head": "e57d165a326278a94e6cb44bfb1f8c8602f3e309",
+      "upstream_sha": "e57d165a326278a94e6cb44bfb1f8c8602f3e309"
+    },
+    {
+      "branch": "revert-4376-fix-anytls-urltest-results",
+      "expected_head": "1e03aac1ddb3034a62f897b1ca078c6d7e22c6c3",
+      "upstream_sha": "1e03aac1ddb3034a62f897b1ca078c6d7e22c6c3"
+    },
+    {
+      "branch": "stable",
+      "expected_head": "a3821e4405e74660726c5b9337181ae2c5306652",
+      "upstream_sha": "777dec2bb943a810c5df605324d2375486869e2f"
+    },
+    {
+      "branch": "testing",
+      "expected_head": "be4fdc3e20120d6021b85835eb420dfc350f50a6",
+      "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2"
+    },
+    {
+      "branch": "unstable",
+      "expected_head": "5b29fd3be47f204a331e3baa6bbac202bb4126ea",
+      "upstream_sha": "5b29fd3be47f204a331e3baa6bbac202bb4126ea"
+    },
+    {
+      "branch": "usbip",
+      "expected_head": "226c9f22eec4212270f24e3af73de39473bec855",
+      "upstream_sha": "226c9f22eec4212270f24e3af73de39473bec855"
+    },
+    {
+      "branch": "custom-dev",
+      "expected_head": "b55b62b476a2cc48414dc9db6b0b41cc4a7e154d",
+      "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2"
+    }
+  ]
 }

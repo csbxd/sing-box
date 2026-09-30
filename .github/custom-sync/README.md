@@ -1,47 +1,75 @@
-# Direct GitHub custom-core synchronization
+# Direct GitHub branch synchronization
 
-This control branch runs real `git cherry-pick` on GitHub Actions. It is the supported
-weekly path; do not launch Work, Codex or cloud_tasks, invent commit metadata with
-connector create_commit, or extract/create credentials. Only the built-in job-scoped
-GITHUB_TOKEN is used.
+This control branch runs real `git cherry-pick` on GitHub Actions using only the
+repository's built-in, job-scoped GITHUB_TOKEN. Do not launch Work/Codex/cloud tasks,
+extract credentials, or reconstruct user commit metadata with connector create_commit.
 
-Update `.github/custom-sync/request.json` on `maintenance/custom-sync` through the
-GitHub connector, after reading both current branch heads and the last `state.json`:
+## Scope and reviewed state
+
+`branches.json` explicitly whitelists all **41 existing same-name upstream branches**
+plus `custom-dev → testing`. `state.json` records their accepted source histories and
+fingerprints. Stable/testing retain their ordered two CI-only guard commits.
+Custom-dev retains the two original user commits plus separate CI-only commits.
+Other 39 branches have no fork-specific commits and synchronize to exact upstream.
+Unknown/new branch intersections require policy review before adding to this list;
+never silently drop a user's commits. Do not modify `state.json` merely to silence a
+source/history mismatch. Only independently audited source/CI updates may change it.
+
+## Weekly connector request
+
+Read current branches in both repositories and compare every existing same-name
+intersection against the whitelist. Read reviewed replay policies/state. For every
+changed target (or all targets for a no-op check), create/update
+`.github/custom-sync/request.json` on **maintenance/custom-sync**:
 
 ```json
 {
-  "schema": 1,
+  "schema": 2,
   "request_id": "20261005-unique-id",
-  "expected_head": "FULL_CURRENT_CUSTOM_DEV_SHA",
-  "upstream_sha": "FULL_CURRENT_SAGERNET_TESTING_SHA"
+  "targets": [
+    {"branch":"custom-dev","expected_head":"FULL_CURRENT_FORK_SHA","upstream_sha":"FULL_SAGERNET_TESTING_SHA"},
+    {"branch":"testing","expected_head":"FULL_CURRENT_FORK_SHA","upstream_sha":"FULL_SAGERNET_TESTING_SHA"},
+    {"branch":"stable","expected_head":"FULL_CURRENT_FORK_SHA","upstream_sha":"FULL_SAGERNET_STABLE_SHA"}
+  ]
 }
 ```
 
-An optional `expected_tree` SHA enforces an independently audited final tree.
-Request IDs are unique alphanumeric/hyphen/underscore strings, at most 80 characters.
-The initial request includes the independently audited tree. Future ordinary
-upstream-only updates may omit it: all cherry-picked patches and author metadata
-are still compared, and conflicts stop the run.
+Use actual lowercase40-character SHAs. request_id is1–80 alphanumeric/hyphen/underscore
+characters, unique for a changing synchronization. An optional per-target
+`expected_tree` enforces an independently audited final tree. Legacy schema1 for
+custom-dev remains supported. Request files must never contain credentials.
 
-The fixed source patch list is the two original user commits, with their original
-authors/dates/full messages. CI-only commits are listed separately in `sync.py`; subsequent CI fixes remain separate from user patches. If the user
-changes custom code or CI, stop and review/update that list; never discard their
-new changes. Source fingerprint excludes only the release request file. A source
-change outside this controlled chain fails closed even when expected_head is known.
+The job preflights **all requested targets before writing any source branch**:
+- Require each exact live fork/upstream head and reviewed replay whitelist
+- Require recorded source ancestry and fingerprint; reject unrecorded user commits
+- Only custom-dev release-request-only descendant commits may be ignored
+- For changed upstream, start at its exact commit and run actual ordered cherry-picks
+- Preserve original author/email/date/full message and compare stable patch IDs
+- Abort on conflicts, changed patches, unexpected metadata or dirty worktrees
+- Keep a backup, then push with atomic `--force-with-lease`; never move release tags
 
-The job verifies current upstream SHA and expected custom head, cherry-picks and
-audits, saves a backup branch, then uses an atomic `--force-with-lease`. It never
-moves tags or deletes backups. `state.json` records the published source SHA/tree,
-original-to-replayed mapping and backup. No source/upstream changes means no rewrite.
-If the state-recording push fails after custom-dev was updated, inspect the immutable
-`custom-sync-audit` artifact and branch; do not blindly retry or drop the source.
+No source/upstream/replay-list change means no rewrite. For upstream-only branches,
+changed history is safely updated to the exact upstream commit only if the saved
+fork history is still unchanged. GITHUB_TOKEN pushes do not trigger other workflows;
+therefore these branch updates do not launch inherited upstream publishing jobs.
+Never substitute direct connector ref updates, which can trigger those workflows.
+Inspect newly introduced workflow/publishing changes during each upstream review,
+and retain the reviewed stable/testing/custom-dev guards.
 
-After terminal success, read state.json and verify custom-dev source SHA equals it.
-Only then submit the separate custom-release/request.json on custom-dev for that
-exact SHA. Observe that release run to terminal success and verify actual assets.
-Then request Android signing only when the owner's genuine signing configuration
-is complete. Never use inherited upstream Build/All/store-publish workflows.
+Successful updates are saved per branch, even if a later lease rejects another
+branch. Read `sync-result.json` from the `custom-sync-audit` artifact and `state.json`
+after the run. If recording state fails after a source push, inspect the artifact
+and exact heads; never blindly retry or overwrite the source. Backups are retained.
 
-Same-name stable/testing branches require their own reviewed upstream+CI guard
-maintenance. This control job handles custom-dev only and never silently resets
-other branches. Pause/report if a matching branch conflicts or lacks a safe path.
+## Release sequence
+
+After terminal sync success, verify each changed source head against state. If
+custom-dev's source fingerprint is unchanged and already released, create no release
+request. Otherwise create/update `.github/custom-release/request.json` on custom-dev
+with schema1 and the exact state source_sha. Observe its terminal success and assets.
+Never dispatch inherited Build/All/store-publish workflows as a substitute.
+
+Android has its own repository-scoped synchronization/signing workflows and token.
+After Android sync and real owner signing setup, request its signed release using
+exact Android source SHA and the verified custom-core release SHA. Never generate
+or transmit signing keys, publish unsigned/debug fallbacks, or use cross-repo tokens.
