@@ -24,7 +24,7 @@ upstream-only updates may omit it: all cherry-picked patches and author metadata
 are still compared, and conflicts stop the run.
 
 The fixed source patch list is the two original user commits, with their original
-authors/dates/full messages. CI is a separate commit named in `sync.py`. If the user
+authors/dates/full messages. CI-only commits are listed separately in `sync.py`; subsequent CI fixes remain separate from user patches. If the user
 changes custom code or CI, stop and review/update that list; never discard their
 new changes. Source fingerprint excludes only the release request file. A source
 change outside this controlled chain fails closed even when expected_head is known.

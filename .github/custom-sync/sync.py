@@ -12,7 +12,7 @@ BRANCH = 'custom-dev'
 CONTROL = 'maintenance/custom-sync'
 ORIGINAL_HEAD = '8eedb38da3d5a7ab6c06356210c93301ed55d733'
 ORIGINALS = ['bdfede69ea4cba6f654dd19ad90c2cb62f465be6', ORIGINAL_HEAD]
-CI_COMMIT = '61a73e57fa2ab7407b5352b65c6843778c8b78d4'
+CI_COMMITS = ['61a73e57fa2ab7407b5352b65c6843778c8b78d4', 'db2b6633159d9ee2b5753174162e22c22296a95b']
 SHA = re.compile(r'[0-9a-f]{40}\Z')
 
 
@@ -71,7 +71,7 @@ def main():
                            'refs/heads/testing').split()[0]
     if current_upstream != upstream:
         raise RuntimeError('Upstream moved; review and submit a fresh request')
-    git('fetch', '--no-tags', 'origin', expected, CI_COMMIT, *ORIGINALS)
+    git('fetch', '--no-tags', 'origin', expected, *CI_COMMITS, *ORIGINALS)
     git('fetch', '--no-tags', 'https://github.com/SagerNet/sing-box.git', upstream)
     state_path = Path('.github/custom-sync/state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else None
@@ -79,7 +79,7 @@ def main():
     accepted_fingerprint = state['source_fingerprint'] if state else fingerprint(ORIGINAL_HEAD)
     if fingerprint(expected) != accepted_fingerprint:
         raise RuntimeError('Custom source changed outside this sync; review new commits before replay')
-    if state and state['upstream_sha'] == upstream and state['ci_commit'] == CI_COMMIT:
+    if state and state['upstream_sha'] == upstream and state.get('ci_commits', [state.get('ci_commit')]) == CI_COMMITS:
         print('Upstream and custom source unchanged; no rewrite or release needed')
         Path('sync-result.json').write_text(json.dumps(dict(state, skip=True), indent=2) + '\n')
         return
@@ -88,7 +88,7 @@ def main():
     git('config', 'user.name', 'github-actions[bot]', cwd=work)
     git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
     mapping = []
-    for original in ORIGINALS + [CI_COMMIT]:
+    for original in ORIGINALS + CI_COMMITS:
         git('cherry-pick', original, cwd=work)
         replayed = git('rev-parse', 'HEAD', cwd=work)
         if metadata(original, work) != metadata(replayed, work):
@@ -104,7 +104,7 @@ def main():
         raise RuntimeError('Final tree differs from independently audited tree')
     if git('status', '--porcelain', cwd=work):
         raise RuntimeError('Cherry-pick worktree is dirty')
-    result = {'schema': 1, 'skip': False, 'upstream_sha': upstream, 'ci_commit': CI_COMMIT,
+    result = {'schema': 1, 'skip': False, 'upstream_sha': upstream, 'ci_commits': CI_COMMITS,
               'previous_head': expected, 'source_sha': new_head, 'source_tree': tree,
               'source_fingerprint': fingerprint(new_head, work), 'mapping': mapping,
               'backup_branch': 'backup/custom-dev-before-sync-' + request['request_id']}

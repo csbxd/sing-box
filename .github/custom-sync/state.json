@@ -4,9 +4,9 @@
   "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2",
   "ci_commit": "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
   "previous_head": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-  "source_sha": "0253cfa5a363b807466a188112dcb6e641559552",
-  "source_tree": "05e6c8e7876a8859900d08d02c24c98c4a6c19b3",
-  "source_fingerprint": "5d1aafdbd3e069493f2f7d20ef62ee2ae469fb76b9b805268cd47c1be92ef9e3",
+  "source_sha": "db2b6633159d9ee2b5753174162e22c22296a95b",
+  "source_tree": "c232544aa8c4d1064432be9ffc4951916be6594b",
+  "source_fingerprint": "6101e41ea60fc39dc749c80eb836800e04962043434be36bda3036455eaafbcc",
   "mapping": [
     {
       "original": "bdfede69ea4cba6f654dd19ad90c2cb62f465be6",
@@ -27,5 +27,12 @@
       "metadata_preserved": true
     }
   ],
-  "backup_branch": "backup/custom-dev-before-sync-initial-real-cherry-pick-20260930"
+  "backup_branch": "backup/custom-dev-before-sync-initial-real-cherry-pick-20260930",
+  "ci_commits": [
+    "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
+    "db2b6633159d9ee2b5753174162e22c22296a95b"
+  ],
+  "ci_followup_commits": [
+    "db2b6633159d9ee2b5753174162e22c22296a95b"
+  ]
 }
