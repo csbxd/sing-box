@@ -1,0 +1,114 @@
+name: Custom core release
+on:
+  workflow_dispatch:
+  push:
+    branches: [custom-dev]
+    paths: ['.github/custom-release/request.json']
+permissions:
+  contents: read
+concurrency:
+  group: custom-core-release
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/custom-dev'
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.plan.outputs.skip }}
+      version: ${{ steps.plan.outputs.version }}
+      source_sha: ${{ steps.plan.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        run: python3 .github/custom-release/plan.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@v4
+        if: steps.plan.outputs.skip != 'true'
+        with:
+          name: custom-release-plan
+          path: release-plan.json
+          if-no-files-found: error
+  build:
+    needs: plan
+    if: needs.plan.outputs.skip == 'false'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, windows, darwin]
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ needs.plan.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.8
+      - name: Build pure-Go CLI
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: '0'
+        run: |
+          set -euo pipefail
+          name="sing-box-${VERSION}-${GOOS}-${GOARCH}"
+          mkdir -p "dist/$name"
+          extension=''
+          if [[ "$GOOS" == windows ]]; then extension='.exe'; fi
+          go build -trimpath -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" \
+            -ldflags "-X github.com/sagernet/sing-box/constant.Version=$VERSION $(cat release/LDFLAGS) -s -w -buildid=" \
+            -o "dist/$name/sing-box$extension" ./cmd/sing-box
+          cp LICENSE "dist/$name/"
+          cd dist
+          if [[ "$GOOS" == windows ]]; then zip -r "$name.zip" "$name"; else tar -czf "$name.tar.gz" "$name"; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: custom-cli-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+          if-no-files-found: error
+  test:
+    needs: plan
+    if: needs.plan.outputs.skip == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ needs.plan.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.8
+      - run: python3 -m unittest discover -s .github/custom-release -p 'test_*.py'
+      - name: Go tests
+        run: go test -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" ./...
+  publish:
+    needs: [plan, build, test]
+    if: needs.plan.outputs.skip == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ needs.plan.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: custom-release-plan
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: custom-cli-*
+          path: dist
+          merge-multiple: true
+      - name: Publish verified build
+        run: python3 .github/custom-release/publish.py
+        env:
+          GH_TOKEN: ${{ github.token }}
