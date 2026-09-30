@@ -1,7 +1,6 @@
 {
   "schema": 1,
-  "request_id": "initial-real-cherry-pick-20260930",
-  "expected_head": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-  "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2",
-  "expected_tree": "05e6c8e7876a8859900d08d02c24c98c4a6c19b3"
+  "request_id": "verify-unchanged-20260930",
+  "expected_head": "b55b62b476a2cc48414dc9db6b0b41cc4a7e154d",
+  "upstream_sha": "927770c29f3e3698c711fc150e1066a4a78793a2"
 }
