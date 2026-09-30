@@ -1,0 +1,29 @@
+name: Cherry-pick custom core sync
+on:
+  push:
+    branches: [maintenance/custom-sync]
+    paths: ['.github/custom-sync/request.json']
+permissions:
+  contents: write
+concurrency:
+  group: custom-core-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+      - name: Test request validation
+        run: python3 -m unittest discover -s .github/custom-sync -p 'test_*.py'
+      - name: Cherry-pick, audit and guarded push
+        run: python3 .github/custom-sync/sync.py
+      - name: Upload immutable audit result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: custom-sync-audit
+          path: sync-result.json
+          if-no-files-found: warn
