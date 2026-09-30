@@ -1,13 +1,26 @@
 package build_shared
 
 import (
+	"fmt"
+	"os"
+	"regexp"
+
 	"github.com/sagernet/sing-box/common/badversion"
 	"github.com/sagernet/sing/common"
 	F "github.com/sagernet/sing/common/format"
 	"github.com/sagernet/sing/common/shell"
 )
 
+// A release workflow may pin the embedded version without creating or replacing tags.
+var buildVersionPattern = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$`)
+
 func ReadTag() (string, error) {
+	if version := os.Getenv("SING_BOX_BUILD_VERSION"); version != "" {
+		if !buildVersionPattern.MatchString(version) {
+			return "", fmt.Errorf("invalid SING_BOX_BUILD_VERSION")
+		}
+		return version, nil
+	}
 	currentTag, err := shell.Exec("git", "describe", "--tags").ReadOutput()
 	if err != nil {
 		return currentTag, err
