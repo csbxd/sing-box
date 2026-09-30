@@ -5,6 +5,7 @@ import json
 import os
 import re
 import subprocess
+import time
 from pathlib import Path
 
 SEMVER = re.compile(r"v?(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\Z")
@@ -16,8 +17,25 @@ def run(*args):
 
 
 def releases(repo):
-    pages = json.loads(run('gh', 'api', '--paginate', '--slurp', f'repos/{repo}/releases?per_page=100'))
-    return [item for page in pages for item in page]
+    # Upstream releases have hundreds of assets: large pages can exceed GitHub's
+    # response limits. Retry only the failed small page, never discard pagination.
+    result = []
+    page = 1
+    while True:
+        for attempt in range(4):
+            try:
+                batch = json.loads(run('gh', 'api', f'repos/{repo}/releases?per_page=10&page={page}'))
+                if not isinstance(batch, list):
+                    raise RuntimeError('Invalid release list response')
+                break
+            except (subprocess.CalledProcessError, json.JSONDecodeError):
+                if attempt == 3:
+                    raise
+                time.sleep(2 ** (attempt + 1))
+        result.extend(batch)
+        if len(batch) < 10:
+            return result
+        page += 1
 
 
 def custom_tag(base, revision):
