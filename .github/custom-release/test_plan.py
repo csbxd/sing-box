@@ -7,6 +7,22 @@ from unittest.mock import patch
 import plan
 
 class PlanTests(unittest.TestCase):
+    def test_releases_paginates_small_pages(self):
+        with patch.object(plan,'run',side_effect=[json.dumps([{}]*10),json.dumps([{'tag_name':'v1.0.0'}])]) as fetch:
+            self.assertEqual(len(plan.releases('owner/repo')),11)
+            self.assertIn('per_page=10&page=2',fetch.call_args.args[-1])
+    def test_releases_retries_transient_failure(self):
+        error=plan.subprocess.CalledProcessError(1,['gh','api'])
+        with patch.object(plan,'run',side_effect=[error,'[]']) as fetch, patch.object(plan.time,'sleep') as sleep:
+            self.assertEqual(plan.releases('owner/repo'),[])
+            self.assertEqual(fetch.call_count,2)
+            sleep.assert_called_once_with(2)
+    def test_releases_fails_closed(self):
+        error=plan.subprocess.CalledProcessError(1,['gh','api'])
+        with patch.object(plan,'run',side_effect=error) as fetch, patch.object(plan.time,'sleep'):
+            with self.assertRaises(plan.subprocess.CalledProcessError):plan.releases('owner/repo')
+            self.assertEqual(fetch.call_count,4)
+
     def test_stable(self):
         self.assertEqual(plan.custom_tag('v1.14.0', 1), 'v1.14.0-c1')
     def test_prerelease(self):
