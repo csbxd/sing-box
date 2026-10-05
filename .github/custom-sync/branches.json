@@ -177,7 +177,22 @@
         "bdfede69ea4cba6f654dd19ad90c2cb62f465be6",
         "8eedb38da3d5a7ab6c06356210c93301ed55d733",
         "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
-        "db2b6633159d9ee2b5753174162e22c22296a95b"
+        "db2b6633159d9ee2b5753174162e22c22296a95b",
+        "74b80933b00712b40b2266985f3af8efbdf1ba6d"
+      ],
+      "resolutions": [
+        {
+          "branch": "custom-dev",
+          "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
+          "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
+          "files": [
+            {
+              "path": "box.go",
+              "resolved_path": ".github/custom-sync/compatibility/box.go",
+              "blob_sha": "a4bef4f6ee8cacd3809f367c02b5a9bba98b8e0b"
+            }
+          ]
+        }
       ]
     }
   }
