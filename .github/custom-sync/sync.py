@@ -116,7 +116,92 @@ def write_audit(result):
     Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
 
 
-def main():
+
+def patch_id_excluding(sha, cwd, paths):
+    patch = run('git', 'show', '--format=', '--binary', '--no-ext-diff',
+                '--no-textconv', sha, '--', '.',
+                *[':(literal,exclude)' + path for path in paths], cwd=cwd)
+    result = run('git', 'patch-id', '--stable', cwd=cwd, data=patch).split()
+    return result[0].decode() if result else None
+
+
+def replay_commit(original, work, branch, upstream, policy):
+    resolutions = policy.get('resolutions', [])
+    matches = [item for item in resolutions if item.get('original') == original]
+    if len(matches) > 1:
+        raise RuntimeError('Duplicate reviewed resolution for original commit')
+    resolution = matches[0] if matches else None
+    if resolution is not None:
+        if resolution.get('branch') != branch or resolution.get('upstream_sha') != upstream:
+            raise RuntimeError('Resolution does not match exact branch/upstream')
+        files = resolution.get('files', [])
+        if not isinstance(files, list) or not files:
+            raise RuntimeError('Resolution has no reviewed conflict files')
+        paths = [item['path'] for item in files]
+        if len(set(paths)) != len(paths):
+            raise RuntimeError('Resolution has duplicate paths')
+        for item in files:
+            path = Path(item['path'])
+            fixture = Path(item['resolved_path'])
+            if (path.is_absolute() or any(part in ('.', '..', '.git') for part in path.parts)
+                    or not path.parts or item['path'] != path.as_posix()
+                    or not item['resolved_path'].startswith('.github/custom-sync/compatibility/')
+                    or fixture.is_absolute() or '..' in fixture.parts
+                    or not SHA.fullmatch(item.get('blob_sha', ''))):
+                raise RuntimeError('Unsafe or unpinned resolution path')
+            if not fixture.is_file() or fixture.is_symlink():
+                raise RuntimeError('Missing regular-file resolution fixture')
+            if git('hash-object', str(fixture)) != item['blob_sha']:
+                raise RuntimeError('Resolution fixture blob differs from reviewed policy')
+    try:
+        git('-c', 'rerere.enabled=false', 'cherry-pick', '--cleanup=verbatim', original, cwd=work)
+    except subprocess.CalledProcessError as error:
+        if error.output:
+            print(error.output.decode(errors='replace'))
+        conflicts = git('diff', '--name-only', '--diff-filter=U', cwd=work).splitlines()
+        if resolution is None or set(conflicts) != set(paths):
+            raise RuntimeError('Unreviewed cherry-pick conflicts in ' + branch + ': ' + ', '.join(conflicts)) from error
+        for item in files:
+            staged = git('ls-files', '--stage', '--', item['path'], cwd=work).splitlines()
+            if not staged or any(row.split()[0] != '100644' for row in staged):
+                raise RuntimeError('Resolution requires an ordinary reviewed text file')
+            destination = work / item['path']
+            if destination.is_symlink() or work.resolve() not in destination.resolve().parents:
+                raise RuntimeError('Resolution would traverse outside replay worktree')
+            destination.write_bytes(Path(item['resolved_path']).read_bytes())
+            git('add', '--', item['path'], cwd=work)
+        git('-c', 'core.editor=true', '-c', 'commit.cleanup=verbatim',
+            'cherry-pick', '--continue', cwd=work)
+    else:
+        if resolution is not None:
+            raise RuntimeError('Configured conflict resolution unexpectedly applied cleanly; review required')
+    replayed = git('rev-parse', 'HEAD', cwd=work)
+    if metadata(original, work) != metadata(replayed, work):
+        raise RuntimeError('Cherry-pick altered original author/date/full message')
+    before, after = patch_id(original, work), patch_id(replayed, work)
+    mapping = {'original': original, 'cherry_pick': replayed,
+               'patch_id': after, 'original_patch_id': before,
+               'metadata_sha256': hashlib.sha256(metadata(replayed, work)).hexdigest(),
+               'metadata_preserved': True}
+    if resolution is None:
+        if before != after:
+            raise RuntimeError('Cherry-pick patch differs; manual review required')
+        mapping['patch_equivalence'] = 'exact'
+    else:
+        original_unaffected = patch_id_excluding(original, work, paths)
+        replayed_unaffected = patch_id_excluding(replayed, work, paths)
+        if original_unaffected != replayed_unaffected:
+            raise RuntimeError('Patch outside reviewed conflict files changed')
+        for item in files:
+            if git('rev-parse', replayed + ':' + item['path'], cwd=work) != item['blob_sha']:
+                raise RuntimeError('Resolved commit differs from pinned reviewed file')
+        mapping.update(patch_equivalence='reviewed-resolution',
+                       unaffected_patch_id=original_unaffected,
+                       resolution=resolution)
+    return mapping
+
+
+def main(prepare_only=False):
     if os.environ['GITHUB_REPOSITORY'] != REPO or os.environ['GITHUB_REF'] != 'refs/heads/' + CONTROL:
         raise RuntimeError('Wrong repository or control branch')
     control_head = os.environ['GITHUB_SHA']
@@ -169,16 +254,7 @@ def main():
         git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
         mapping = []
         for original in replay:
-            git('-c', 'rerere.enabled=false', 'cherry-pick', '--cleanup=verbatim', original, cwd=work)
-            replayed = git('rev-parse', 'HEAD', cwd=work)
-            if metadata(original, work) != metadata(replayed, work):
-                raise RuntimeError('Cherry-pick altered original author/date/message')
-            before, after = patch_id(original, work), patch_id(replayed, work)
-            if before != after:
-                raise RuntimeError('Cherry-pick patch differs; manual review required')
-            mapping.append({'original': original, 'cherry_pick': replayed,
-                            'patch_id': after, 'metadata_sha256': hashlib.sha256(metadata(replayed, work)).hexdigest(),
-                            'metadata_preserved': True})
+            mapping.append(replay_commit(original, work, branch, upstream, policy))
         new_head = git('rev-parse', 'HEAD', cwd=work)
         tree = git('rev-parse', 'HEAD^{tree}', cwd=work)
         if target.get('expected_tree') and target['expected_tree'] != tree:
@@ -198,6 +274,11 @@ def main():
     print(json.dumps(result, indent=2))
     changed = [record for record in prepared if not record['skip']]
     ensure_request_current(targets, config, control_head)
+    if prepare_only:
+        result['status'] = 'validated-only'
+        write_audit(result)
+        print('Read-only preparation complete; no source, backup or state writes')
+        return
     if not changed:
         result['status'] = 'noop'
         write_audit(result)
@@ -256,4 +337,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--prepare-only', action='store_true')
+    args = parser.parse_args()
+    main(prepare_only=args.prepare_only)
