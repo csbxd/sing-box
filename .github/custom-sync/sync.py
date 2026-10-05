@@ -170,6 +170,13 @@ def replay_commit(original, work, branch, upstream, policy):
                 raise RuntimeError('Resolution would traverse outside replay worktree')
             destination.write_bytes(Path(item['resolved_path']).read_bytes())
             git('add', '--', item['path'], cwd=work)
+        # Git appends conflict hints to MERGE_MSG. Restore only the exact original
+        # message bytes; author/date still come from the real CHERRY_PICK_HEAD.
+        original_commit = subprocess.check_output(['git', 'cat-file', 'commit', original], cwd=work)
+        merge_message = Path(git('rev-parse', '--git-path', 'MERGE_MSG', cwd=work))
+        if not merge_message.is_absolute():
+            merge_message = work / merge_message
+        merge_message.write_bytes(original_commit.split(b'\n\n', 1)[1])
         git('-c', 'core.editor=true', '-c', 'commit.cleanup=verbatim',
             'cherry-pick', '--continue', cwd=work)
     else:
