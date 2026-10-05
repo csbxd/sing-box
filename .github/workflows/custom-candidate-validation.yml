@@ -1,0 +1,46 @@
+name: Validate reviewed core candidate
+on:
+  push:
+    branches: [maintenance/custom-sync]
+    paths: ['.github/custom-sync/validation-request.json']
+permissions:
+  contents: read
+concurrency:
+  group: custom-core-candidate-validation
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test all synchronization and resolution safeguards
+        run: python3 -m unittest discover -v -s .github/custom-sync -p 'test_*.py'
+      - name: Prepare real reviewed cherry-picks without remote writes
+        run: python3 .github/custom-sync/sync.py --prepare-only --request-path .github/custom-sync/validation-request.json
+      - name: Save exact candidate audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-candidate-audit
+          path: sync-result.json
+          if-no-files-found: error
+      - name: Check out the exact prepared custom source
+        run: |
+          set -euo pipefail
+          source="$(python3 -c 'import json; a=json.load(open("sync-result.json")); assert a["status"] == "validated-only"; print(next(r["source_sha"] for r in a["targets"] if r["branch"] == "custom-dev"))')"
+          git checkout --detach "$source"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.8
+      - name: Existing core release planner tests
+        run: python3 -m unittest discover -v -s .github/custom-release -p 'test_*.py'
+      - name: Full core Go tests
+        run: go test -v -exec sudo -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" ./...
+      - name: Service discovery and dialer race tests
+        run: go test -race -v -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" ./sd ./common/dialer
+      - name: Lifecycle integration race tests
+        run: go test -race -v -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" -run 'TestServiceDiscovery' .
