@@ -178,7 +178,7 @@ def replay_commit(original, work, branch, upstream, policy):
             merge_message = work / merge_message
         merge_message.write_bytes(original_commit.split(b'\n\n', 1)[1])
         git('-c', 'core.editor=true', '-c', 'commit.cleanup=verbatim',
-            'cherry-pick', '--continue', cwd=work)
+            '-c', 'commit.status=false', 'cherry-pick', '--continue', '--edit', cwd=work)
     else:
         if resolution is not None:
             raise RuntimeError('Configured conflict resolution unexpectedly applied cleanly; review required')
