@@ -201,13 +201,15 @@ def replay_commit(original, work, branch, upstream, policy):
     return mapping
 
 
-def main(prepare_only=False):
+def main(prepare_only=False, request_path='.github/custom-sync/request.json'):
     if os.environ['GITHUB_REPOSITORY'] != REPO or os.environ['GITHUB_REF'] != 'refs/heads/' + CONTROL:
         raise RuntimeError('Wrong repository or control branch')
     control_head = os.environ['GITHUB_SHA']
     if not SHA.fullmatch(control_head) or git('rev-parse', 'HEAD') != control_head:
         raise RuntimeError('Checkout does not match the immutable workflow commit')
-    request = json.loads(Path('.github/custom-sync/request.json').read_text())
+    if request_path != '.github/custom-sync/request.json' and (not prepare_only or request_path != '.github/custom-sync/validation-request.json'):
+        raise RuntimeError('Alternate request path is allowed only for read-only validation')
+    request = json.loads(Path(request_path).read_text())
     targets = validate_request(request)
     config = json.loads(Path('.github/custom-sync/branches.json').read_text())['branches']
     state_path = Path('.github/custom-sync/state.json')
@@ -340,5 +342,6 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--prepare-only', action='store_true')
+    parser.add_argument('--request-path', default='.github/custom-sync/request.json')
     args = parser.parse_args()
-    main(prepare_only=args.prepare_only)
+    main(prepare_only=args.prepare_only, request_path=args.request_path)
