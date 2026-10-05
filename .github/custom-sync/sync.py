@@ -169,7 +169,7 @@ def main():
         git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
         mapping = []
         for original in replay:
-            git('-c', 'rerere.enabled=false', 'cherry-pick', original, cwd=work)
+            git('-c', 'rerere.enabled=false', 'cherry-pick', '--cleanup=verbatim', original, cwd=work)
             replayed = git('rev-parse', 'HEAD', cwd=work)
             if metadata(original, work) != metadata(replayed, work):
                 raise RuntimeError('Cherry-pick altered original author/date/message')
