@@ -89,3 +89,28 @@ Android has its own repository-scoped synchronization/signing workflows and toke
 After Android sync and real owner signing setup, request its signed release using
 exact Android source SHA and the verified custom-core release SHA. Never generate
 or transmit signing keys, publish unsigned/debug fallbacks, or use cross-repo tokens.
+
+## Explicitly reviewed lifecycle compatibility
+
+The owner approved resolving the service-discovery conflict on 2026-10-05.
+The original feature commit remains a real cherry-pick with its raw author/date
+and complete message preserved. Its only exception is the two obsolete lifecycle
+integration hunks in `box.go`, resolved to a fully reviewed, hash-pinned file for
+exact branch `custom-dev`, original `8eedb38da3d5a7ab6c06356210c93301ed55d733`,
+and upstream `2ff3985c0a8fd628ab10b9ec9cd3d37512909c57`.
+The resolution is not reusable for another upstream or commit. All other feature
+files retain binary-inclusive stable patch equivalence. The audit explicitly
+distinguishes `reviewed-resolution` from `exact` rather than claiming full patch
+equivalence for the resolved feature commit.
+
+A separate compatibility replay commit adapts the SD manager and live-test setup,
+adds lifecycle regression tests, and leaves the original discovery/cache/dialer
+logic and existing test assertions intact. Auxiliary maintenance commits are
+review material, not release targets.
+
+Before publication, submit a schema2 request at
+`.github/custom-sync/validation-request.json`. The read-only candidate workflow
+runs all safety tests, actual cherry-picks with `--prepare-only`, full Go tests,
+and SD/dialer/lifecycle race tests. It cannot push refs. Independently review its
+audit and require each changed target's exact `expected_tree` in the subsequent
+live request. No failed validation authorizes skipping checks or changing state.
