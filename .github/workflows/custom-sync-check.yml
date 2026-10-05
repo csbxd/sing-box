@@ -1,0 +1,29 @@
+name: Validate atomic core sync
+on:
+  push:
+    branches: [maintenance/custom-sync]
+    paths:
+      - '.github/custom-sync/sync.py'
+      - '.github/custom-sync/test_*.py'
+      - '.github/workflows/custom-sync-check.yml'
+  pull_request:
+    paths:
+      - '.github/custom-sync/sync.py'
+      - '.github/custom-sync/test_*.py'
+      - '.github/workflows/custom-sync-check.yml'
+permissions:
+  contents: read
+concurrency:
+  group: custom-core-sync-check-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  test:
+    if: github.repository == 'csbxd/sing-box'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
+      - name: Run request and real-Git transaction safety tests
+        run: python3 -m unittest discover -v -s .github/custom-sync -p 'test_*.py'
