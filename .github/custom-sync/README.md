@@ -46,7 +46,9 @@ The job preflights **all requested targets before writing any source branch**:
 - For changed upstream, start at its exact commit and run actual ordered cherry-picks
 - Preserve original author/email/date/full message and compare stable patch IDs
 - Abort on conflicts, changed patches, unexpected metadata or dirty worktrees
-- Keep a backup, then push with atomic `--force-with-lease`; never move release tags
+- Prepare backup refs, source updates and state locally, then publish all of them in
+  **one** `git push --atomic` transaction, with exact source/control head leases and
+  create-only backup leases; never move release tags
 
 No source/upstream/replay-list change means no rewrite. For upstream-only branches,
 changed history is safely updated to the exact upstream commit only if the saved
@@ -56,10 +58,24 @@ Never substitute direct connector ref updates, which can trigger those workflows
 Inspect newly introduced workflow/publishing changes during each upstream review,
 and retain the reviewed stable/testing/custom-dev guards.
 
-Successful updates are saved per branch, even if a later lease rejects another
-branch. Read `sync-result.json` from the `custom-sync-audit` artifact and `state.json`
-after the run. If recording state fails after a source push, inspect the artifact
-and exact heads; never blindly retry or overwrite the source. Backups are retained.
+All requested targets are audited before publication. A rejected source, control,
+backup lease or server hook rejects the entire transaction: no partial source,
+backup or state updates. The workflow commit must still be the exact live control
+head before preflight and immediately before publication. Backups are create-only
+and remain retained after success. All-no-op requests perform no remote writes.
+
+Read `sync-result.json` from the `custom-sync-audit` artifact and `state.json` after
+the run. The audit records the planned state commit and a terminal verified/noop
+status. A transport error can leave the client uncertain even for an atomic push;
+inspect all exact remote refs and the planned state commit before any fresh request.
+Never retry with non-atomic or unleased pushes. Never update state to conceal a mismatch.
+
+The read-only **Validate atomic core sync** workflow runs the existing request/history
+unit tests and temporary-bare-repository integration tests on control-code changes.
+These tests exercise real cherry-picks, metadata and patch preservation, conflicts,
+no-op behavior, stale source/control heads, backup races and server-side rejection.
+Require successful tests and independent review of the exact repair commit before
+submitting a real synchronization request.
 
 ## Release sequence
 
