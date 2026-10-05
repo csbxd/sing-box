@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Actual cherry-pick synchronization with metadata/patch audits and a lease."""
+"""Audited real cherry-picks with one atomic source, backup and state transaction."""
 import hashlib
 import json
 import os
@@ -9,15 +9,16 @@ from pathlib import Path
 
 REPO = 'csbxd/sing-box'
 CONTROL = 'maintenance/custom-sync'
+UPSTREAM = 'https://github.com/SagerNet/sing-box.git'
 SHA = re.compile(r'[0-9a-f]{40}\Z')
 
 
 def run(*args, cwd=None, data=None):
-    return subprocess.check_output(args, cwd=cwd, input=data).strip()
+    return subprocess.check_output(args, cwd=cwd, input=data)
 
 
 def git(*args, cwd=None):
-    return run('git', *args, cwd=cwd).decode()
+    return run('git', *args, cwd=cwd).decode().strip()
 
 
 def fingerprint(sha, cwd=None):
@@ -27,15 +28,26 @@ def fingerprint(sha, cwd=None):
 
 
 def patch_id(sha, cwd):
-    patch = run('git', 'show', '--format=', '--no-ext-diff', sha, cwd=cwd)
-    return run('git', 'patch-id', '--stable', cwd=cwd, data=patch).split()[0].decode()
+    patch = run('git', 'show', '--format=', '--binary', '--no-ext-diff', sha, cwd=cwd)
+    result = run('git', 'patch-id', '--stable', cwd=cwd, data=patch).split()
+    if not result:
+        raise RuntimeError('Empty replay patch requires explicit review: ' + sha)
+    return result[0].decode()
 
 
 def metadata(sha, cwd):
-    return run('git', 'show', '-s', '--format=%an%x00%ae%x00%aI%x00%B', sha, cwd=cwd)
+    # Compare the raw author header and complete message, without stripping any bytes.
+    raw = subprocess.check_output(['git', 'cat-file', 'commit', sha], cwd=cwd)
+    headers, message = raw.split(b'\n\n', 1)
+    authors = [line for line in headers.split(b'\n') if line.startswith(b'author ')]
+    if len(authors) != 1:
+        raise RuntimeError('Invalid author header')
+    return authors[0] + b'\n\n' + message
 
 
 def validate_request(request):
+    if not isinstance(request, dict):
+        raise RuntimeError('Request must be an object')
     if request.get('schema') == 1:
         targets = [dict(request, branch='custom-dev')]
     elif request.get('schema') == 2 and isinstance(request.get('targets'), list):
@@ -44,18 +56,20 @@ def validate_request(request):
         raise RuntimeError('Unsupported request schema')
     if not targets or len(targets) > 100:
         raise RuntimeError('Expected 1..100 targets')
-    if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', request.get('request_id', '')):
+    if not isinstance(request.get('request_id'), str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', request['request_id']):
         raise RuntimeError('Invalid request_id')
     seen = set()
     for target in targets:
+        if not isinstance(target, dict):
+            raise RuntimeError('Target must be an object')
         branch = target.get('branch')
         if not isinstance(branch, str) or branch in seen:
             raise RuntimeError('Invalid or duplicate target branch')
         seen.add(branch)
         for key in ('expected_head', 'upstream_sha'):
-            if not SHA.fullmatch(target.get(key, '')):
+            if not isinstance(target.get(key), str) or not SHA.fullmatch(target[key]):
                 raise RuntimeError('Invalid immutable SHA: ' + key)
-        if 'expected_tree' in target and not SHA.fullmatch(target['expected_tree']):
+        if 'expected_tree' in target and (not isinstance(target['expected_tree'], str) or not SHA.fullmatch(target['expected_tree'])):
             raise RuntimeError('Invalid expected tree')
     return targets
 
@@ -85,9 +99,29 @@ def remote_head(ref):
     return rows[0].split()[0]
 
 
+def ensure_request_current(targets, config, control_head):
+    if remote_head(CONTROL) != control_head:
+        raise RuntimeError('A newer control commit superseded this request')
+    for target in targets:
+        branch = target['branch']
+        if remote_head(branch) != target['expected_head']:
+            raise RuntimeError('User branch changed: ' + branch)
+        upstream_ref = 'refs/heads/' + config[branch]['upstream_branch']
+        rows = git('ls-remote', '--exit-code', '--heads', UPSTREAM, upstream_ref).splitlines()
+        if len(rows) != 1 or rows[0].split() != [target['upstream_sha'], upstream_ref]:
+            raise RuntimeError('Upstream moved; submit a fresh reviewed request: ' + branch)
+
+
+def write_audit(result):
+    Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
+
+
 def main():
     if os.environ['GITHUB_REPOSITORY'] != REPO or os.environ['GITHUB_REF'] != 'refs/heads/' + CONTROL:
         raise RuntimeError('Wrong repository or control branch')
+    control_head = os.environ['GITHUB_SHA']
+    if not SHA.fullmatch(control_head) or git('rev-parse', 'HEAD') != control_head:
+        raise RuntimeError('Checkout does not match the immutable workflow commit')
     request = json.loads(Path('.github/custom-sync/request.json').read_text())
     targets = validate_request(request)
     config = json.loads(Path('.github/custom-sync/branches.json').read_text())['branches']
@@ -95,6 +129,13 @@ def main():
     state = json.loads(state_path.read_text())
     if state.get('schema') != 2:
         raise RuntimeError('Branch state needs migration before any rewrite')
+    for target in targets:
+        branch = target['branch']
+        if branch not in config or branch not in state['branches']:
+            raise RuntimeError('Target has no reviewed replay policy: ' + branch)
+        git('check-ref-format', 'refs/heads/' + branch)
+        git('check-ref-format', 'refs/heads/' + config[branch]['upstream_branch'])
+    ensure_request_current(targets, config, control_head)
     prepared = []
     # Audit every requested target before any branch write. Unknown custom edits,
     # unreviewed branches and conflicts fail the entire preflight closed.
@@ -111,22 +152,24 @@ def main():
         if remote_head(branch) != expected:
             raise RuntimeError('User branch changed: ' + branch)
         upstream_ref = 'refs/heads/' + policy['upstream_branch']
-        advertised = git('ls-remote', '--exit-code', 'https://github.com/SagerNet/sing-box.git', upstream_ref).split()[0]
+        advertised = git('ls-remote', '--exit-code', UPSTREAM, upstream_ref).split()[0]
         if advertised != upstream:
             raise RuntimeError('Upstream moved: ' + branch)
         git('fetch', '--no-tags', 'origin', expected, recorded['source_sha'], *replay)
         verify_known_history(branch, expected, recorded)
         if recorded['upstream_sha'] == upstream and recorded['replay_commits'] == replay:
+            if target.get('expected_tree') and target['expected_tree'] != git('rev-parse', expected + '^{tree}'):
+                raise RuntimeError('No-op tree differs from independently audited tree')
             prepared.append({'branch': branch, 'skip': True, 'source_sha': expected})
             continue
-        git('fetch', '--no-tags', 'https://github.com/SagerNet/sing-box.git', upstream)
+        git('fetch', '--no-tags', UPSTREAM, upstream)
         work = Path(os.environ['RUNNER_TEMP']) / ('custom-cherry-pick-' + str(index))
         git('worktree', 'add', '--detach', str(work), upstream)
         git('config', 'user.name', 'github-actions[bot]', cwd=work)
         git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=work)
         mapping = []
         for original in replay:
-            git('cherry-pick', original, cwd=work)
+            git('-c', 'rerere.enabled=false', 'cherry-pick', original, cwd=work)
             replayed = git('rev-parse', 'HEAD', cwd=work)
             if metadata(original, work) != metadata(replayed, work):
                 raise RuntimeError('Cherry-pick altered original author/date/message')
@@ -134,7 +177,8 @@ def main():
             if before != after:
                 raise RuntimeError('Cherry-pick patch differs; manual review required')
             mapping.append({'original': original, 'cherry_pick': replayed,
-                            'patch_id': after, 'metadata_preserved': True})
+                            'patch_id': after, 'metadata_sha256': hashlib.sha256(metadata(replayed, work)).hexdigest(),
+                            'metadata_preserved': True})
         new_head = git('rev-parse', 'HEAD', cwd=work)
         tree = git('rev-parse', 'HEAD^{tree}', cwd=work)
         if target.get('expected_tree') and target['expected_tree'] != tree:
@@ -147,37 +191,68 @@ def main():
                   'source_fingerprint': fingerprint(new_head, work), 'mapping': mapping,
                   'backup_branch': 'backup/sync-' + request['request_id'] + '/' + branch}
         prepared.append(record)
-    result = {'schema': 2, 'targets': prepared, 'applied': []}
-    Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
+    result = {'schema': 2, 'request_id': request['request_id'],
+              'control_commit': control_head, 'targets': prepared, 'applied': [],
+              'status': 'prepared'}
+    write_audit(result)
     print(json.dumps(result, indent=2))
+    changed = [record for record in prepared if not record['skip']]
+    ensure_request_current(targets, config, control_head)
+    if not changed:
+        result['status'] = 'noop'
+        write_audit(result)
+        print('All targets unchanged; no source, backup or state writes')
+        return
+    for record in changed:
+        backup_ref = 'refs/heads/' + record['backup_branch']
+        git('check-ref-format', backup_ref)
+        if git('ls-remote', '--heads', 'origin', backup_ref):
+            raise RuntimeError('Backup branch already exists; never replace it')
+        state['branches'][record['branch']] = record
+    # Prepare state locally. No remote ref has changed at this point.
+    state_path.write_text(json.dumps(state, indent=2) + '\n')
+    git('config', 'user.name', 'github-actions[bot]')
+    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
+    git('add', str(state_path))
+    git('commit', '-m', 'Record verified atomic branch replay sync results')
+    state_commit = git('rev-parse', 'HEAD')
+    if git('rev-parse', state_commit + '^') != control_head:
+        raise RuntimeError('State commit is not based on the audited control head')
+    result['state_commit'] = state_commit
+    write_audit(result)
+    ensure_request_current(targets, config, control_head)
+    # One receive transaction covers every source, backup and state update.
+    # Empty backup leases prohibit replacing even fast-forward-compatible refs.
+    leases = ['--force-with-lease=refs/heads/' + CONTROL + ':' + control_head]
+    refspecs = [state_commit + ':refs/heads/' + CONTROL]
+    for record in changed:
+        leases += ['--force-with-lease=refs/heads/' + record['branch'] + ':' + record['previous_head'],
+                   '--force-with-lease=refs/heads/' + record['backup_branch'] + ':']
+        refspecs += [record['source_sha'] + ':refs/heads/' + record['branch'],
+                     record['previous_head'] + ':refs/heads/' + record['backup_branch']]
     try:
-        for record in prepared:
-            if record['skip']:
-                print('Unchanged; no rewrite needed: ' + record['branch'])
-                continue
-            branch, expected = record['branch'], record['previous_head']
-            if remote_head(branch) != expected:
-                raise RuntimeError('Branch changed during audit; no overwrite: ' + branch)
-            backup = record['backup_branch']
-            if git('ls-remote', '--heads', 'origin', 'refs/heads/' + backup):
-                raise RuntimeError('Backup branch already exists; never replace it')
-            git('push', 'origin', expected + ':refs/heads/' + backup)
-            git('push', '--force-with-lease=refs/heads/' + branch + ':' + expected,
-                'origin', record['source_sha'] + ':refs/heads/' + branch)
-            if remote_head(branch) != record['source_sha']:
-                raise RuntimeError('Remote verification failed: ' + branch)
-            state['branches'][branch] = record
-            result['applied'].append(branch)
-            Path('sync-result.json').write_text(json.dumps(result, indent=2) + '\n')
-    finally:
-        # Persist successful targets even if a later target's lease rejects a write.
-        if result['applied']:
-            state_path.write_text(json.dumps(state, indent=2) + '\n')
-            git('config', 'user.name', 'github-actions[bot]')
-            git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
-            git('add', str(state_path))
-            git('commit', '-m', 'Record verified branch replay sync results')
-            git('push', 'origin', 'HEAD:refs/heads/' + CONTROL)
+        git('push', '--atomic', *leases, 'origin', *refspecs)
+    except Exception:
+        # A transport failure can be ambiguous. Preserve the plan for inspection;
+        # never automatically retry or try a non-atomic fallback.
+        result['status'] = 'push_failed_inspect_remote'
+        write_audit(result)
+        raise
+    result['status'] = 'pushed'
+    result['applied'] = [record['branch'] for record in changed]
+    write_audit(result)
+    if remote_head(CONTROL) != state_commit:
+        raise RuntimeError('Control changed after atomic push; inspect audit/state')
+    for record in changed:
+        if remote_head(record['branch']) != record['source_sha']:
+            raise RuntimeError('Source changed after atomic push; inspect audit/state')
+        if remote_head(record['backup_branch']) != record['previous_head']:
+            raise RuntimeError('Backup verification failed; inspect audit/state')
+    for record in prepared:
+        if record['skip'] and remote_head(record['branch']) != record['source_sha']:
+            raise RuntimeError('No-op source changed during atomic push; inspect audit/state')
+    result['status'] = 'verified'
+    write_audit(result)
 
 
 if __name__ == '__main__':
