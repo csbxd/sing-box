@@ -36,7 +36,7 @@ func TestLiveCloudflareDiscovery(t *testing.T) {
 	registry := dns.NewTransportRegistry()
 	hosts.RegisterTransport(registry)
 	logger := log.NewNOPFactory()
-	dnsManager := dns.NewTransportManager(logger.Logger(), registry, nil, "bootstrap")
+	dnsManager := dns.NewTransportManager(registry, nil, "bootstrap")
 	ctx = service.ContextWith[adapter.DNSTransportManager](ctx, dnsManager)
 	router, err := dns.NewRouter(ctx, logger, option.DNSOptions{})
 	require.NoError(t, err)
@@ -44,11 +44,11 @@ func TestLiveCloudflareDiscovery(t *testing.T) {
 	predefined := new(badjson.TypedMap[string, badoption.Listable[netip.Addr]])
 	predefined.Put(cloudflareAPIHost, addresses)
 	require.NoError(t, dnsManager.Create(ctx, logger.Logger(), "bootstrap", C.DNSTypeHosts, &option.HostsDNSServerOptions{Predefined: predefined}))
-	defer dnsManager.Close()
-	defer router.Close()
+	scope := adapter.NewScope(ctx, logger.Logger())
+	defer scope.Close()
 	for _, stage := range adapter.ListStartStages {
-		require.NoError(t, dnsManager.Start(stage))
-		require.NoError(t, router.Start(stage))
+		require.NoError(t, scope.Start("dns-transport", dnsManager, stage))
+		require.NoError(t, scope.Start("dns-router", router, stage))
 	}
 	options := cloudflareOptions()
 	options.APIToken = token
