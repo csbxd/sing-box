@@ -36,6 +36,15 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: 1.26.8
+      - name: Check compatibility source formatting
+        run: |
+          set -euo pipefail
+          files=(box.go sd/manager.go sd/live_test.go sd/manager_lifecycle_test.go sd_lifecycle_test.go)
+          unformatted="$(gofmt -l "${files[@]}")"
+          if [[ -n "$unformatted" ]]; then
+            gofmt -d "${files[@]}"
+            exit 1
+          fi
       - name: Existing core release planner tests
         run: python3 -m unittest discover -v -s .github/custom-release -p 'test_*.py'
       - name: Full core Go tests
