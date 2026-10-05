@@ -1,26 +1,30 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261005-atomic-reviewed-1252",
+  "request_id": "weekly-20261005-sd-reviewed-1329",
   "targets": [
     {
       "branch": "docs",
       "expected_head": "cbe83acdc5845fcb8fb1bce44c96f9c227ead098",
-      "upstream_sha": "14d66d4311c92d1e08dcf45e8797482f280761e3"
+      "upstream_sha": "14d66d4311c92d1e08dcf45e8797482f280761e3",
+      "expected_tree": "80c8ce5496726ab9a99505759d5b5e426d806c31"
     },
     {
       "branch": "stable",
       "expected_head": "a3821e4405e74660726c5b9337181ae2c5306652",
-      "upstream_sha": "b93f56a7a0469d8e5993b1369dfaf9225ac85814"
+      "upstream_sha": "b93f56a7a0469d8e5993b1369dfaf9225ac85814",
+      "expected_tree": "e742988e5bc24e5c766b67eb1a0300848f1da079"
     },
     {
       "branch": "testing",
       "expected_head": "be4fdc3e20120d6021b85835eb420dfc350f50a6",
-      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57"
+      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
+      "expected_tree": "6834db5d8bcab2246bd8c25b61aeb146d43c24ab"
     },
     {
       "branch": "custom-dev",
       "expected_head": "b55b62b476a2cc48414dc9db6b0b41cc4a7e154d",
-      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57"
+      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
+      "expected_tree": "9d05a650d63f8f7502422f9913e9fd438236fc4f"
     }
   ]
 }
