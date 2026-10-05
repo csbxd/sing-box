@@ -45,6 +45,7 @@ type Manager struct {
 	capacity          int
 	mu                sync.Mutex
 	closed            bool
+	lifecycleStarted  bool
 	cache             map[string]*list.Element
 	lru               list.List
 	flights           map[flightKey]*flight
@@ -101,9 +102,34 @@ func NewManager(ctx context.Context, logger log.ContextLogger, options option.Se
 	return m, nil
 }
 
-func (m *Manager) Name() string                   { return "service discovery" }
-func (m *Manager) Start(adapter.StartStage) error { return nil }
-func (m *Manager) HasServer(tag string) bool      { _, ok := m.providers[tag]; return ok }
+func (m *Manager) Name() string              { return "service discovery" }
+func (m *Manager) HasServer(tag string) bool { _, ok := m.providers[tag]; return ok }
+
+func (m *Manager) Start(stage adapter.StartStage, scope *adapter.Scope) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.closed {
+		return E.New("sd is closed")
+	}
+	if stage != adapter.StartStateInitialize || m.lifecycleStarted {
+		return nil
+	}
+	if err := scope.Context().Err(); err != nil {
+		return err
+	}
+	if err := m.ctx.Err(); err != nil {
+		return err
+	}
+	// Keep the constructor context used by providers, and connect it to the
+	// lifecycle scope so cancellation reaches in-flight and optimistic queries.
+	stop := context.AfterFunc(scope.Context(), m.cancel)
+	scope.Add(func() error {
+		stop()
+		return m.Close()
+	})
+	m.lifecycleStarted = true
+	return nil
+}
 
 func (m *Manager) Close() error {
 	m.mu.Lock()
