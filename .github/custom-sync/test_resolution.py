@@ -132,7 +132,14 @@ class ResolutionTests(unittest.TestCase):
 
     def test_scoped_conflict_preserves_metadata_and_unaffected_text_and_binary(self):
         self.replay_fixture()
-        result = self.replay()
+        try:
+            result = self.replay()
+        except RuntimeError:
+            print("Original raw author/message:", repr(
+                self.raw_metadata(self.original, cwd=self.work)))
+            print("Replayed raw author/message:", repr(
+                self.raw_metadata("HEAD", cwd=self.work)))
+            raise
         replayed = result["cherry_pick"]
         self.assertEqual(result["patch_equivalence"], "reviewed-resolution")
         self.assertTrue(result["metadata_preserved"])
