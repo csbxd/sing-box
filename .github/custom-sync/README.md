@@ -97,7 +97,10 @@ The original feature commit remains a real cherry-pick with its raw author/date
 and complete message preserved. Its only exception is the two obsolete lifecycle
 integration hunks in `box.go`, resolved to a fully reviewed, hash-pinned file for
 exact branch `custom-dev`, original `8eedb38da3d5a7ab6c06356210c93301ed55d733`,
-and upstream `2ff3985c0a8fd628ab10b9ec9cd3d37512909c57`.
+and upstream `fe92ab3e78a9bb7d448c155ef6906218e2ca5453`.
+This exact new SHA was independently re-reviewed on 2026-10-08: its upstream
+`box.go` blob is identical to the earlier 2026-10-05 candidate. The exception remains
+limited to the pinned resolved file; all other patches must retain equivalence.
 The resolution is not reusable for another upstream or commit. All other feature
 files retain binary-inclusive stable patch equivalence. The audit explicitly
 distinguishes `reviewed-resolution` from `exact` rather than claiming full patch
@@ -114,3 +117,12 @@ runs all safety tests, actual cherry-picks with `--prepare-only`, full Go tests,
 and SD/dialer/lifecycle race tests. It cannot push refs. Independently review its
 audit and require each changed target's exact `expected_tree` in the subsequent
 live request. No failed validation authorizes skipping checks or changing state.
+
+## Authorized local execution on 2026-10-08
+
+The owner explicitly authorized this asa local-task synchronization and release.
+The same audited transaction and exact leases apply. SSH owner pushes trigger
+workflows, so replay the separate inherited Build trigger guard on stable/testing
+and custom-dev. Test/Lint remain enabled. Missing release requests safely skip;
+existing invalid requests fail. This one-time authorization does not change the
+weekly connector-only policy.

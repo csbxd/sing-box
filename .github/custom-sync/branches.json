@@ -153,14 +153,16 @@
       "upstream_branch": "stable",
       "replay_commits": [
         "cc9529990cca8510c2f14290e2c4d6950da03540",
-        "a3821e4405e74660726c5b9337181ae2c5306652"
+        "a3821e4405e74660726c5b9337181ae2c5306652",
+        "03084bb02bc2fc2e628c4d047a482f1a127ac49d"
       ]
     },
     "testing": {
       "upstream_branch": "testing",
       "replay_commits": [
         "98a5602deeefd47125c056a0c616e547a7ea697a",
-        "be4fdc3e20120d6021b85835eb420dfc350f50a6"
+        "be4fdc3e20120d6021b85835eb420dfc350f50a6",
+        "03084bb02bc2fc2e628c4d047a482f1a127ac49d"
       ]
     },
     "unstable": {
@@ -178,13 +180,15 @@
         "8eedb38da3d5a7ab6c06356210c93301ed55d733",
         "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
         "db2b6633159d9ee2b5753174162e22c22296a95b",
-        "74b80933b00712b40b2266985f3af8efbdf1ba6d"
+        "74b80933b00712b40b2266985f3af8efbdf1ba6d",
+        "03084bb02bc2fc2e628c4d047a482f1a127ac49d",
+        "2d09e27c9d3960211d31f0f2d39f8450912e06e9"
       ],
       "resolutions": [
         {
           "branch": "custom-dev",
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
+          "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
           "files": [
             {
               "path": "box.go",
