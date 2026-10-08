@@ -30,11 +30,6 @@ on:
         description: "TestFlight test message"
         required: false
         type: string
-  push:
-    branches:
-      - stable
-      - testing
-      - unstable
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ inputs.build }}
