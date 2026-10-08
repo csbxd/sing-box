@@ -51,6 +51,41 @@ class PlanTests(unittest.TestCase):
         items=[{'draft':True,'tag_name':'v1.15.0'}, {'draft':False,'tag_name':'v1.15.0-rc.1'}]
         self.assertEqual(plan.select_series_release(items,'1.15.0-alpha.9')['tag_name'],'v1.15.0-rc.1')
 
+    def test_push_missing_request_skips_without_api(self):
+        original = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp:
+            os.chdir(tmp)
+            try:
+                with patch.dict(os.environ, {'GITHUB_REPOSITORY':'csbxd/sing-box',
+                                            'GITHUB_OUTPUT':'output', 'GITHUB_EVENT_NAME':'push'}), \
+                     patch.object(plan, 'run', return_value='a'*40), \
+                     patch.object(plan, 'releases') as api:
+                    plan.main()
+                    api.assert_not_called()
+                self.assertEqual(Path('output').read_text(), 'skip=true\n')
+            finally:
+                os.chdir(original)
+
+    def test_push_invalid_existing_request_fails(self):
+        original = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp:
+            os.chdir(tmp)
+            try:
+                request = Path('.github/custom-release/request.json')
+                request.parent.mkdir(parents=True)
+                for content in ('invalid json', '{}', '{"schema":1,"source_sha":"bad"}'):
+                    request.write_text(content)
+                    with patch.dict(os.environ, {'GITHUB_REPOSITORY':'csbxd/sing-box',
+                                                'GITHUB_OUTPUT':'output', 'GITHUB_EVENT_NAME':'push'}), \
+                         patch.object(plan, 'run', return_value='a'*40), \
+                         patch.object(plan, 'releases') as api:
+                        with self.assertRaises((RuntimeError, json.JSONDecodeError)):
+                            plan.main()
+                        api.assert_not_called()
+                self.assertFalse(Path('output').exists())
+            finally:
+                os.chdir(original)
+
     def test_unchanged_tree_skips_without_upstream_fetch(self):
         original = os.getcwd()
         with tempfile.TemporaryDirectory() as tmp:
