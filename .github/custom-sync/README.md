@@ -151,3 +151,30 @@ guards without changing source/state/backups or publishing a release. It does
 not exercise authenticated push permissions, prove token scopes/expiry, or prove
 revocation of any previously exposed token. Missing or invalid credentials must
 never cause fallback to GITHUB_TOKEN or removal of atomic/lease safeguards.
+
+## Isolated real push permission proof
+
+The one-shot `push_probe.py` is separate from synchronization. After reviewing a
+CI-only code commit and its successful tests, create only
+`.github/custom-sync/push-probe-request.json` in a direct child commit containing
+`{"schema":1,"request_id":"UNIQUE-LOWERCASE-ID","code_commit":"EXACT_REVIEWED_SHA"}`.
+Use 6–60 lowercase letters/digits/hyphens for the actual request ID.
+
+The dedicated workflow first runs tests without the owner secret. Its trusted
+probe step removes CUSTOM_SYNC_TOKEN from the process environment immediately,
+then reuses sync.py's exact atomic push credential helper. It never calls sync
+or changes its request/state/replay policies. First it atomically creates two
+unique `permission-probe/ID/content` and `permission-probe/ID/workflow` branches
+with only an inert PROBE.md and create-only leases. Next it atomically updates
+both with exact expected-head leases, adding a workflow_dispatch-only workflow
+whose sole job is disabled and permissions are empty. The fixture has no
+push/PR/schedule trigger, external actions, secrets or release behavior.
+
+All existing branch/tag refs, including source/control/backups, must be identical
+before and after the two transactions. The probe branches are retained as audit
+evidence; no ref deletion occurs. Repeated attempts or existing probe refs fail
+closed. On failure inspect the exact remote refs and staged audit before any
+fresh request. No credential fallback, unleased force, or permission expansion
+is allowed. The proof establishes real Contents and workflow-file push rights
+for these isolated refs, not exemption from source-branch-specific rules, token
+expiry in the future, or revocation of a previously exposed credential.

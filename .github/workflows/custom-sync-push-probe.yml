@@ -1,0 +1,47 @@
+name: Verify isolated CUSTOM_SYNC_TOKEN push
+on:
+  push:
+    branches: [maintenance/custom-sync]
+    paths: ['.github/custom-sync/push-probe-request.json']
+permissions:
+  contents: read
+concurrency:
+  group: isolated-custom-sync-token-proof
+  cancel-in-progress: false
+jobs:
+  test:
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Compile and test without the owner credential
+        run: |
+          python3 -m py_compile .github/custom-sync/*.py
+          python3 -m unittest discover -v -s .github/custom-sync -p 'test_*.py'
+  prove:
+    needs: test
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prove contents and workflow writes on two isolated retained refs
+        env:
+          CUSTOM_SYNC_REQUIRE_TOKEN: '1'
+          CUSTOM_SYNC_TOKEN: ${{ secrets.CUSTOM_SYNC_TOKEN }}
+        run: python3 .github/custom-sync/push_probe.py
+      - name: Save credential-free immutable permission proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: custom-sync-push-proof
+          path: push-probe-result.json
+          if-no-files-found: warn
