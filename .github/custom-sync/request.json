@@ -1,30 +1,258 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261005-sd-reviewed-1329",
+  "request_id": "20261008-sync-token-noop-core",
   "targets": [
     {
+      "branch": "archive",
+      "expected_head": "2e4eb9aa3952639314ca155adad49b650bcde460",
+      "upstream_sha": "2e4eb9aa3952639314ca155adad49b650bcde460",
+      "expected_tree": "136013962006ca2265beb65d11d0b334ed0af8df"
+    },
+    {
+      "branch": "ccm-ocm-improvements",
+      "expected_head": "db8b42c107c16164ccea885ac7283d23112512d0",
+      "upstream_sha": "db8b42c107c16164ccea885ac7283d23112512d0",
+      "expected_tree": "4df3b54554af71b0d387e8400707a7e856ef9f36"
+    },
+    {
+      "branch": "cloudflared",
+      "expected_head": "1f1ba549fd971bd20eb3edf1ab9664c99d0335b0",
+      "upstream_sha": "1f1ba549fd971bd20eb3edf1ab9664c99d0335b0",
+      "expected_tree": "80315979fff7f3fc423c1b6f26974e7e7eef0a3e"
+    },
+    {
+      "branch": "copilot/improve-code-efficiency",
+      "expected_head": "dfb4ef2deb364cbc88a25aa3567c38ce7694ef58",
+      "upstream_sha": "dfb4ef2deb364cbc88a25aa3567c38ce7694ef58",
+      "expected_tree": "508d4d22800686bc8fdf84065ebebf0f38d24ae7"
+    },
+    {
+      "branch": "dependabot/go_modules/github.com/go-jose/go-jose/v4-4.1.4",
+      "expected_head": "2780400fe79b8ad5cdc7dd8283804da3ccf61ab4",
+      "upstream_sha": "2780400fe79b8ad5cdc7dd8283804da3ccf61ab4",
+      "expected_tree": "73b11b5784e2d0faa4cdacee62de0a18ce840ab3"
+    },
+    {
+      "branch": "dependabot/go_modules/google.golang.org/grpc-1.79.3",
+      "expected_head": "76273a3c6df5316cd3e1f2caf6cef903528083ab",
+      "upstream_sha": "76273a3c6df5316cd3e1f2caf6cef903528083ab",
+      "expected_tree": "f42302f7f4f887bfee8083aa871ab401bbca586e"
+    },
+    {
+      "branch": "dependabot/go_modules/test/filippo.io/edwards25519-1.1.1",
+      "expected_head": "84986688f3fff35947b14744fb304ed7a01e5f0b",
+      "upstream_sha": "84986688f3fff35947b14744fb304ed7a01e5f0b",
+      "expected_tree": "3ffe224d56e265993a035b79cf612fe0e6f55e89"
+    },
+    {
+      "branch": "dependabot/go_modules/test/github.com/docker/docker-28.0.0incompatible",
+      "expected_head": "d82be7d86bf4a3362394f544a221e36e14abba4a",
+      "upstream_sha": "d82be7d86bf4a3362394f544a221e36e14abba4a",
+      "expected_tree": "35b40c41b2bd9a0e2d0836e6ba0c9c0ab2ea73bc"
+    },
+    {
+      "branch": "dependabot/go_modules/test/go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp-1.43.0",
+      "expected_head": "ece8a0b062f013a675e3c9117f389edcbf49a4c6",
+      "upstream_sha": "ece8a0b062f013a675e3c9117f389edcbf49a4c6",
+      "expected_tree": "834ae132dbb20b8e4e2635bd372d52439806fc32"
+    },
+    {
+      "branch": "dependabot/go_modules/test/go.opentelemetry.io/otel-1.41.0",
+      "expected_head": "010b1e74a3c2c4aa8eeedd1604ec2a04420967e9",
+      "upstream_sha": "010b1e74a3c2c4aa8eeedd1604ec2a04420967e9",
+      "expected_tree": "dd0a446aabe80300214234287535405dc549001e"
+    },
+    {
+      "branch": "dependabot/go_modules/test/google.golang.org/grpc-1.79.3",
+      "expected_head": "096669d0ac0e9646531a52f59dc04f9de93979b1",
+      "upstream_sha": "096669d0ac0e9646531a52f59dc04f9de93979b1",
+      "expected_tree": "3ead9270294fa34e7c32e554d454bda584a11924"
+    },
+    {
+      "branch": "dev-auto-redirect-firewalld",
+      "expected_head": "1974c767c95f5ffb69e0a1e6dcbcc6d211860da9",
+      "upstream_sha": "1974c767c95f5ffb69e0a1e6dcbcc6d211860da9",
+      "expected_tree": "757dd02cf5632f0d64c99d6b7a6e5d964b061ebe"
+    },
+    {
+      "branch": "dev-daemon",
+      "expected_head": "f48f8c5d1cf26b88ceec64bf416b15674f46c4e8",
+      "upstream_sha": "f48f8c5d1cf26b88ceec64bf416b15674f46c4e8",
+      "expected_tree": "85804eca02c0d74f57440aa4f4f5a51a456cf0fc"
+    },
+    {
+      "branch": "dev-dns-timeout",
+      "expected_head": "0d8c15932fd92547dc8fbd8b3611053ed67582be",
+      "upstream_sha": "0d8c15932fd92547dc8fbd8b3611053ed67582be",
+      "expected_tree": "eb3a400c148a95df264bba57a7cc5a268d4d6a5e"
+    },
+    {
+      "branch": "dev-go124-ech",
+      "expected_head": "658d4a180b939a934117f80e6ce31661fbc80c0a",
+      "upstream_sha": "658d4a180b939a934117f80e6ce31661fbc80c0a",
+      "expected_tree": "8dc13f3b8b92073ada970c5329f5f3d1141958e8"
+    },
+    {
+      "branch": "dev-l3-route",
+      "expected_head": "9092139e735ebb7d98368589a29a9f416d632fba",
+      "upstream_sha": "9092139e735ebb7d98368589a29a9f416d632fba",
+      "expected_tree": "9fdc0d6b6f5267768f6a7e407c7577c6a72076ab"
+    },
+    {
+      "branch": "dev-mitm",
+      "expected_head": "003423745ebd1e038a4be796dcd55e4a42ffc562",
+      "upstream_sha": "003423745ebd1e038a4be796dcd55e4a42ffc562",
+      "expected_tree": "6f552a9323774c93201f6beb8965059bb1d03b3d"
+    },
+    {
+      "branch": "dev-mitm-2",
+      "expected_head": "5cca8893c9a351a1834b03b891cb46ff00d1e5e3",
+      "upstream_sha": "5cca8893c9a351a1834b03b891cb46ff00d1e5e3",
+      "expected_tree": "92dc08b9856332945eb7106b070ca946374d63ef"
+    },
+    {
+      "branch": "dev-mitm-3",
+      "expected_head": "29bdf47e44830d4346b167bc952a39946f1696c1",
+      "upstream_sha": "29bdf47e44830d4346b167bc952a39946f1696c1",
+      "expected_tree": "b94373823f10d06b84de0922204ae94e3258c657"
+    },
+    {
+      "branch": "dev-ndis",
+      "expected_head": "79d3649a8b2dc20de469ad0896569c70ea242aa4",
+      "upstream_sha": "79d3649a8b2dc20de469ad0896569c70ea242aa4",
+      "expected_tree": "1c687bf5df53b99a5282fdcd64a82a2d2165fb80"
+    },
+    {
+      "branch": "dev-next-wip",
+      "expected_head": "47736b27ba624f59690d4e455cb4a7f9b104d83a",
+      "upstream_sha": "47736b27ba624f59690d4e455cb4a7f9b104d83a",
+      "expected_tree": "92ac14c019f7d4d06cb5b1f51babe94a677abe05"
+    },
+    {
+      "branch": "dev-ping",
+      "expected_head": "00870d2833e902065ed2279f5d5885a4670813a3",
+      "upstream_sha": "00870d2833e902065ed2279f5d5885a4670813a3",
+      "expected_tree": "ba06ddcde6bb3665d53435ad65ddd0c6eadd4f48"
+    },
+    {
+      "branch": "dev-sentry-debug",
+      "expected_head": "05b4d9885241bc9fe58d01c9513bb05c8fb4c33d",
+      "upstream_sha": "05b4d9885241bc9fe58d01c9513bb05c8fb4c33d",
+      "expected_tree": "1423831b91633fe774216a41294c0b8b5a85efc0"
+    },
+    {
+      "branch": "dev-ssm-api",
+      "expected_head": "d34091f8fc7ca691ecd2e1426a0f6b6a58138635",
+      "upstream_sha": "d34091f8fc7ca691ecd2e1426a0f6b6a58138635",
+      "expected_tree": "b8e966df4944739b70a8c9b525acbd3383935d58"
+    },
+    {
+      "branch": "dev-test-mitm",
+      "expected_head": "1189d880489e00b0da5523d11aadd96d91dc3e46",
+      "upstream_sha": "1189d880489e00b0da5523d11aadd96d91dc3e46",
+      "expected_tree": "6ab034423d2f59083efaa2bd8069098dc087e155"
+    },
+    {
+      "branch": "dev-tls-fragment",
+      "expected_head": "420d8d144a3f1bc42735ee5a2b72869fc2abfa77",
+      "upstream_sha": "420d8d144a3f1bc42735ee5a2b72869fc2abfa77",
+      "expected_tree": "9338a4999b5c6e6a12020ab7ebe5e624b47ba87e"
+    },
+    {
+      "branch": "dev-ts",
+      "expected_head": "bbcd4cf31287381104ea4450e303a8c23664abff",
+      "upstream_sha": "bbcd4cf31287381104ea4450e303a8c23664abff",
+      "expected_tree": "c6716ab20fc685641eeee78776165cbd51d49dfb"
+    },
+    {
+      "branch": "dev-ts-relay",
+      "expected_head": "4637f8182d96da5e96d6f62c8c78467123b053bd",
+      "upstream_sha": "4637f8182d96da5e96d6f62c8c78467123b053bd",
+      "expected_tree": "edfcc4ffa3298c80af8f5b72e4c14253b105c0c2"
+    },
+    {
+      "branch": "dev-wifi-linux",
+      "expected_head": "766972ce528d93dc53403fc8eb363f7e259ef813",
+      "upstream_sha": "766972ce528d93dc53403fc8eb363f7e259ef813",
+      "expected_tree": "1af6c4edc4da1944d065deb2a96e017d78000ab2"
+    },
+    {
       "branch": "docs",
-      "expected_head": "cbe83acdc5845fcb8fb1bce44c96f9c227ead098",
+      "expected_head": "14d66d4311c92d1e08dcf45e8797482f280761e3",
       "upstream_sha": "14d66d4311c92d1e08dcf45e8797482f280761e3",
       "expected_tree": "80c8ce5496726ab9a99505759d5b5e426d806c31"
     },
     {
+      "branch": "draft-windows-auto-redirect",
+      "expected_head": "b1b6bf07ae7c9166bb4fd732ac9bc0a24991efde",
+      "upstream_sha": "b1b6bf07ae7c9166bb4fd732ac9bc0a24991efde",
+      "expected_tree": "1417b95bd6cb4302f0464b349cfd10647a09ab56"
+    },
+    {
+      "branch": "fix-acme-http-tls-challenge",
+      "expected_head": "86c44a3e126ec3a5dc95ff7a95e4dc2da3b56eee",
+      "upstream_sha": "86c44a3e126ec3a5dc95ff7a95e4dc2da3b56eee",
+      "expected_tree": "bfd3b520976b2946d7670312a71c09f772584905"
+    },
+    {
+      "branch": "oldstable",
+      "expected_head": "78d3eeedacdda487eca7f2793e29973cb2f8a86c",
+      "upstream_sha": "78d3eeedacdda487eca7f2793e29973cb2f8a86c",
+      "expected_tree": "dd389fcc66add23baddd0a0a7785571e9c419de8"
+    },
+    {
+      "branch": "renovate/dockerfile",
+      "expected_head": "90b379966c6c9341b5a583d485839865b54c6427",
+      "upstream_sha": "90b379966c6c9341b5a583d485839865b54c6427",
+      "expected_tree": "7b8918e3a2bc6490911c1e4ec720a003f80c6bda"
+    },
+    {
+      "branch": "renovate/github-actions",
+      "expected_head": "ecf633af50fe41ddf569fa914923863f6a09f840",
+      "upstream_sha": "ecf633af50fe41ddf569fa914923863f6a09f840",
+      "expected_tree": "6d7b96cb531fe4e87122f0339485a27f865a2ebd"
+    },
+    {
+      "branch": "renovate/major-github-actions",
+      "expected_head": "e57d165a326278a94e6cb44bfb1f8c8602f3e309",
+      "upstream_sha": "e57d165a326278a94e6cb44bfb1f8c8602f3e309",
+      "expected_tree": "10145c3e38b83a7acdd62211888c29e8038653b6"
+    },
+    {
+      "branch": "revert-4376-fix-anytls-urltest-results",
+      "expected_head": "1e03aac1ddb3034a62f897b1ca078c6d7e22c6c3",
+      "upstream_sha": "1e03aac1ddb3034a62f897b1ca078c6d7e22c6c3",
+      "expected_tree": "59794bbe03d51e47fc0f45c173f147cdc70ba5ae"
+    },
+    {
       "branch": "stable",
-      "expected_head": "a3821e4405e74660726c5b9337181ae2c5306652",
-      "upstream_sha": "b93f56a7a0469d8e5993b1369dfaf9225ac85814",
-      "expected_tree": "e742988e5bc24e5c766b67eb1a0300848f1da079"
+      "expected_head": "eba4ccdce9e25306b182f969dbe0a137dd968de2",
+      "upstream_sha": "3e21554dec613d566cd00a4d1acc26f520d0dd15",
+      "expected_tree": "5d4c5975678abf69ea3b36c2492cc7755c828b3e"
     },
     {
       "branch": "testing",
-      "expected_head": "be4fdc3e20120d6021b85835eb420dfc350f50a6",
-      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
-      "expected_tree": "6834db5d8bcab2246bd8c25b61aeb146d43c24ab"
+      "expected_head": "a091a5471f4c2a3d4eaf0a6eafbc7b48795818b8",
+      "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
+      "expected_tree": "b6a5c236ea212d99685c8edde9f443735c873e1f"
+    },
+    {
+      "branch": "unstable",
+      "expected_head": "5b29fd3be47f204a331e3baa6bbac202bb4126ea",
+      "upstream_sha": "5b29fd3be47f204a331e3baa6bbac202bb4126ea",
+      "expected_tree": "eb474e9711ffb6e9f51698b948bd028c6aeef5d4"
+    },
+    {
+      "branch": "usbip",
+      "expected_head": "226c9f22eec4212270f24e3af73de39473bec855",
+      "upstream_sha": "226c9f22eec4212270f24e3af73de39473bec855",
+      "expected_tree": "8b6f131e709a21f28e20f40c222d89b49783eafa"
     },
     {
       "branch": "custom-dev",
-      "expected_head": "b55b62b476a2cc48414dc9db6b0b41cc4a7e154d",
-      "upstream_sha": "2ff3985c0a8fd628ab10b9ec9cd3d37512909c57",
-      "expected_tree": "9d05a650d63f8f7502422f9913e9fd438236fc4f"
+      "expected_head": "717251665c648744d67d0122c112ca2617f330a8",
+      "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
+      "expected_tree": "928c3dbb61f26093b72ef7f7da1ec9b879d5a65b"
     }
   ]
 }
