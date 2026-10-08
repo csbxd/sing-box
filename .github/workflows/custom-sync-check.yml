@@ -3,14 +3,12 @@ on:
   push:
     branches: [maintenance/custom-sync]
     paths:
-      - '.github/custom-sync/sync.py'
-      - '.github/custom-sync/test_*.py'
-      - '.github/workflows/custom-sync-check.yml'
+      - '.github/custom-sync/*.py'
+      - '.github/workflows/custom-sync*.yml'
   pull_request:
     paths:
-      - '.github/custom-sync/sync.py'
-      - '.github/custom-sync/test_*.py'
-      - '.github/workflows/custom-sync-check.yml'
+      - '.github/custom-sync/*.py'
+      - '.github/workflows/custom-sync*.yml'
 permissions:
   contents: read
 concurrency:
@@ -19,11 +17,13 @@ concurrency:
 jobs:
   test:
     if: github.repository == 'csbxd/sing-box'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           persist-credentials: false
-      - name: Run request and real-Git transaction safety tests
+      - name: Compile trusted control scripts
+        run: python3 -m py_compile .github/custom-sync/*.py
+      - name: Run request, credential-isolation and real-Git transaction tests
         run: python3 -m unittest discover -v -s .github/custom-sync -p 'test_*.py'

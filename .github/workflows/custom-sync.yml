@@ -4,25 +4,40 @@ on:
     branches: [maintenance/custom-sync]
     paths: ['.github/custom-sync/request.json']
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: custom-core-sync
   cancel-in-progress: false
 jobs:
-  sync:
+  test:
     if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
+          persist-credentials: false
+      - name: Test all reviewed synchronization safeguards without secrets
+        run: python3 -m unittest discover -v -s .github/custom-sync -p 'test_*.py'
+  sync:
+    needs: test
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Test request validation
-        run: python3 -m unittest discover -s .github/custom-sync -p 'test_*.py'
-      - name: Cherry-pick, audit and guarded push
+          persist-credentials: false
+      - name: Audit and atomically synchronize with owner-managed credentials
+        env:
+          CUSTOM_SYNC_REQUIRE_TOKEN: '1'
+          CUSTOM_SYNC_TOKEN: ${{ secrets.CUSTOM_SYNC_TOKEN }}
         run: python3 .github/custom-sync/sync.py
-      - name: Upload immutable audit result
+      - name: Save credential-free immutable audit result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: custom-sync-audit
           path: sync-result.json
