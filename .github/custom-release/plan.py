@@ -90,7 +90,13 @@ def main():
         raise RuntimeError('This workflow is restricted to csbxd/sing-box')
     sha = run('git', 'rev-parse', 'HEAD')
     if os.environ.get('GITHUB_EVENT_NAME') == 'push':
-        request = json.loads(Path('.github/custom-release/request.json').read_text())
+        request_path = Path('.github/custom-release/request.json')
+        if not request_path.exists():
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                out.write('skip=true\n')
+            print('No release request; skip publication')
+            return
+        request = json.loads(request_path.read_text())
         if request.get('schema') != 1 or not re.fullmatch(r'[0-9a-f]{40}', request.get('source_sha', '')):
             raise RuntimeError('Invalid immutable release request')
         sha = request['source_sha']
