@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261012-reviewed-core-subset",
+  "request_id": "weekly-20261012-reviewed-core-all",
   "targets": [
     {
       "branch": "archive",
@@ -206,6 +206,11 @@
       "branch": "usbip",
       "expected_head": "226c9f22eec4212270f24e3af73de39473bec855",
       "upstream_sha": "226c9f22eec4212270f24e3af73de39473bec855"
+    },
+    {
+      "branch": "custom-dev",
+      "expected_head": "717251665c648744d67d0122c112ca2617f330a8",
+      "upstream_sha": "e4b7e692f4545890bfc9d43960328e1449fa803b"
     }
   ]
 }
