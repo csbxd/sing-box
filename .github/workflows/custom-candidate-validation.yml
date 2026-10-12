@@ -28,15 +28,22 @@ jobs:
           name: reviewed-candidate-audit
           path: sync-result.json
           if-no-files-found: error
+      - name: Select exact validated candidate targets
+        id: candidates
+        run: python3 .github/custom-sync/candidate_validation.py
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.8
+      - name: Full Go tests or static docs checks for every changed non-custom candidate
+        run: python3 .github/custom-sync/candidate_validation.py --run-subset
       - name: Check out the exact prepared custom source
+        if: steps.candidates.outputs.custom_source != ''
         run: |
           set -euo pipefail
           source="$(python3 -c 'import json; a=json.load(open("sync-result.json")); assert a["status"] == "validated-only"; print(next(r["source_sha"] for r in a["targets"] if r["branch"] == "custom-dev"))')"
           git checkout --detach "$source"
-      - uses: actions/setup-go@v5
-        with:
-          go-version: 1.26.8
       - name: Check compatibility source formatting
+        if: steps.candidates.outputs.custom_source != ''
         run: |
           set -euo pipefail
           files=(box.go sd/manager.go sd/live_test.go sd/manager_lifecycle_test.go sd_lifecycle_test.go)
@@ -46,10 +53,14 @@ jobs:
             exit 1
           fi
       - name: Existing core release planner tests
+        if: steps.candidates.outputs.custom_source != ''
         run: python3 -m unittest discover -v -s .github/custom-release -p 'test_*.py'
       - name: Full core Go tests
+        if: steps.candidates.outputs.custom_source != ''
         run: go test -v -exec sudo -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" ./...
       - name: Service discovery and dialer race tests
+        if: steps.candidates.outputs.custom_source != ''
         run: go test -race -v -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" ./sd ./common/dialer
       - name: Lifecycle integration race tests
+        if: steps.candidates.outputs.custom_source != ''
         run: go test -race -v -tags "$(cat release/DEFAULT_BUILD_TAGS_OTHERS)" -ldflags "$(cat release/LDFLAGS)" -run 'TestServiceDiscovery' .
