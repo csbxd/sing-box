@@ -2,6 +2,10 @@ import copy
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+import os
+import subprocess
+import tempfile
 
 spec = importlib.util.spec_from_file_location('candidate_validation', Path(__file__).with_name('candidate_validation.py'))
 module = importlib.util.module_from_spec(spec)
@@ -54,6 +58,24 @@ class CandidateSelectionTests(unittest.TestCase):
             mutate(candidate)
             with self.subTest(candidate=candidate), self.assertRaises(ValueError):
                 module.select(candidate, request, sha)
+
+
+    def test_subset_go_failure_propagates_and_cleans_up(self):
+        audit, request, sha = self.fixtures()
+        _, rows = module.select(audit, request, sha)
+        def run(command, **kwargs):
+            if command[0] == 'go':
+                raise subprocess.CalledProcessError(1, command)
+        with tempfile.TemporaryDirectory() as root:
+            with patch.dict(os.environ, {'RUNNER_TEMP': root}), \
+                    patch.object(module.subprocess, 'run', side_effect=run) as command, \
+                    patch.object(module.subprocess, 'check_output', return_value=('c' * 40).encode()), \
+                    patch.object(module.Path, 'is_file', return_value=True), \
+                    patch.object(module.Path, 'read_text', side_effect=['tags', 'flags']):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    module.validate_subset(rows)
+                self.assertEqual(command.call_args_list[-1].args[0][:4],
+                                 ['git', 'worktree', 'remove', '--force'])
 
 
 if __name__ == '__main__':
