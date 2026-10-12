@@ -188,7 +188,7 @@
         {
           "branch": "custom-dev",
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
+          "upstream_sha": "e4b7e692f4545890bfc9d43960328e1449fa803b",
           "files": [
             {
               "path": "box.go",

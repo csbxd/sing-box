@@ -100,14 +100,24 @@ The original feature commit remains a real cherry-pick with its raw author/date
 and complete message preserved. Its only exception is the two obsolete lifecycle
 integration hunks in `box.go`, resolved to a fully reviewed, hash-pinned file for
 exact branch `custom-dev`, original `8eedb38da3d5a7ab6c06356210c93301ed55d733`,
-and upstream `fe92ab3e78a9bb7d448c155ef6906218e2ca5453`.
-This exact new SHA was independently re-reviewed on 2026-10-08: its upstream
-`box.go` blob is identical to the earlier 2026-10-05 candidate. The exception remains
-limited to the pinned resolved file; all other patches must retain equivalence.
-The resolution is not reusable for another upstream or commit. All other feature
-files retain binary-inclusive stable patch equivalence. The audit explicitly
-distinguishes `reviewed-resolution` from `exact` rather than claiming full patch
-equivalence for the resolved feature commit.
+and upstream `e4b7e692f4545890bfc9d43960328e1449fa803b`.
+The exact upstream pin `e4b7e692f4545890bfc9d43960328e1449fa803b` was
+independently re-reviewed on 2026-10-12 using exact old/new file trees. Its
+`box.go` blob and all paths touched by the original service-discovery commit
+are unchanged from `fe92ab3e78a9bb7d448c155ef6906218e2ca5453`. The lifecycle
+interfaces and cancellation/cleanup ordering are unchanged; Scope.Close now
+flattens cleanup errors and suppresses closed/canceled errors. The existing SD
+scoped-lifecycle adaptation remains compatible. The seven ordered replay
+commits and the hash-pinned resolved file remain unchanged.
+
+This review authorizes candidate preparation only: successful exact-candidate
+Go/race tests, replay metadata/patch checks, and independent final-tree review
+remain required before source publication. The exception remains limited to the
+pinned resolved file and exact reviewed upstream; it is not reusable for another
+upstream or commit. All other feature files retain binary-inclusive stable
+patch equivalence. The audit explicitly distinguishes `reviewed-resolution`
+from `exact` rather than claiming full patch equivalence for the resolved feature
+commit.
 
 A separate compatibility replay commit adapts the SD manager and live-test setup,
 adds lifecycle regression tests, and leaves the original discovery/cache/dialer
