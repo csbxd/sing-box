@@ -78,5 +78,19 @@ class CandidateSelectionTests(unittest.TestCase):
                                  ['git', 'worktree', 'remove', '--force'])
 
 
+    def test_subset_tree_mismatch_fails_before_go(self):
+        audit, request, sha = self.fixtures()
+        _, rows = module.select(audit, request, sha)
+        with tempfile.TemporaryDirectory() as root:
+            with patch.dict(os.environ, {'RUNNER_TEMP': root}), \
+                    patch.object(module.subprocess, 'run') as command, \
+                    patch.object(module.subprocess, 'check_output', return_value=('e' * 40).encode()):
+                with self.assertRaisesRegex(ValueError, 'Prepared source tree changed'):
+                    module.validate_subset(rows)
+                self.assertTrue(all(call.args[0][0] == 'git' for call in command.call_args_list))
+                self.assertEqual(command.call_args_list[-1].args[0][:4],
+                                 ['git', 'worktree', 'remove', '--force'])
+
+
 if __name__ == '__main__':
     unittest.main()
