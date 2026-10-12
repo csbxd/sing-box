@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "request_id": "20261008-sync-token-noop-core",
+  "request_id": "weekly-20261012-restored-reviewed-all",
   "targets": [
     {
       "branch": "archive",
@@ -179,8 +179,8 @@
     {
       "branch": "docs",
       "expected_head": "14d66d4311c92d1e08dcf45e8797482f280761e3",
-      "upstream_sha": "14d66d4311c92d1e08dcf45e8797482f280761e3",
-      "expected_tree": "80c8ce5496726ab9a99505759d5b5e426d806c31"
+      "upstream_sha": "898adc512e0fa152bec99675153f65bb716914c4",
+      "expected_tree": "8e63ea541853d689e2c0156c5d6b3073c0246eaa"
     },
     {
       "branch": "draft-windows-auto-redirect",
@@ -227,14 +227,14 @@
     {
       "branch": "stable",
       "expected_head": "eba4ccdce9e25306b182f969dbe0a137dd968de2",
-      "upstream_sha": "3e21554dec613d566cd00a4d1acc26f520d0dd15",
-      "expected_tree": "5d4c5975678abf69ea3b36c2492cc7755c828b3e"
+      "upstream_sha": "d630fa94c53b2e2bdf256fad8b9d1cff809146ed",
+      "expected_tree": "5b5ef55727fdc202fa395957823b35c2b0b09dba"
     },
     {
       "branch": "testing",
       "expected_head": "a091a5471f4c2a3d4eaf0a6eafbc7b48795818b8",
-      "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
-      "expected_tree": "b6a5c236ea212d99685c8edde9f443735c873e1f"
+      "upstream_sha": "e4b7e692f4545890bfc9d43960328e1449fa803b",
+      "expected_tree": "6601d9fd95020e38534af91d59807a894818ae78"
     },
     {
       "branch": "unstable",
@@ -251,8 +251,8 @@
     {
       "branch": "custom-dev",
       "expected_head": "717251665c648744d67d0122c112ca2617f330a8",
-      "upstream_sha": "fe92ab3e78a9bb7d448c155ef6906218e2ca5453",
-      "expected_tree": "928c3dbb61f26093b72ef7f7da1ec9b879d5a65b"
+      "upstream_sha": "e4b7e692f4545890bfc9d43960328e1449fa803b",
+      "expected_tree": "ad1566e74dfc7572113325b6e42157bd6dee7807"
     }
   ]
 }
