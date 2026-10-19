@@ -100,15 +100,19 @@ The original feature commit remains a real cherry-pick with its raw author/date
 and complete message preserved. Its only exception is the two obsolete lifecycle
 integration hunks in `box.go`, resolved to a fully reviewed, hash-pinned file for
 exact branch `custom-dev`, original `8eedb38da3d5a7ab6c06356210c93301ed55d733`,
-and upstream `e4b7e692f4545890bfc9d43960328e1449fa803b`.
-The exact upstream pin `e4b7e692f4545890bfc9d43960328e1449fa803b` was
-independently re-reviewed on 2026-10-12 using exact old/new file trees. Its
-`box.go` blob and all paths touched by the original service-discovery commit
-are unchanged from `fe92ab3e78a9bb7d448c155ef6906218e2ca5453`. The lifecycle
-interfaces and cancellation/cleanup ordering are unchanged; Scope.Close now
-flattens cleanup errors and suppresses closed/canceled errors. The existing SD
-scoped-lifecycle adaptation remains compatible. The seven ordered replay
-commits and the hash-pinned resolved file remain unchanged.
+and upstream `dfb80349bf5779ec0a3f834c9ec2794345bff8f0`.
+The exact upstream pin was independently re-reviewed on 2026-10-19 against
+`e4b7e692f4545890bfc9d43960328e1449fa803b`. The only upstream changes are
+go.mod/go.sum updating sing-tun from 5c2edb183cc9 to 9ffa5391a2ad. Both upstream
+box.go blobs are cca663cf35b90d4ea4c4714c73c15fe347c1b700, and both
+adapter/lifecycle.go blobs are 1e9922eb2961ade0c73e64f3f7f9557d20158c99.
+All original service-discovery paths and lifecycle interfaces are unchanged.
+The seven ordered replay commits and resolved fixture
+a4bef4f6ee8cacd3809f367c02b5a9bba98b8e0b remain unchanged.
+The dependency update changes Go-stack hairpin batching, Darwin buffer flushing,
+and reverse arena traversal, without a public API or minimum Go-version change.
+Hairpin backpressure and Darwin buffer lifetime remain runtime risks requiring
+the exact-candidate validation below; this review does not waive any tests.
 
 This review authorizes candidate preparation only: successful exact-candidate
 Go/race tests, replay metadata/patch checks, and independent final-tree review
