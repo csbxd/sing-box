@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261019-reviewed-all",
+  "request_id": "weekly-20261026-reviewed-subset",
   "targets": [
     {
       "branch": "archive",
@@ -150,7 +150,7 @@
     {
       "branch": "docs",
       "expected_head": "898adc512e0fa152bec99675153f65bb716914c4",
-      "upstream_sha": "898adc512e0fa152bec99675153f65bb716914c4"
+      "upstream_sha": "bb4c016a47cd26246a5ad8c222cc024d47122113"
     },
     {
       "branch": "draft-windows-auto-redirect",
@@ -190,13 +190,12 @@
     {
       "branch": "stable",
       "expected_head": "63aba7e1283a6ebdd164a82b34171351f1104ae9",
-      "upstream_sha": "d630fa94c53b2e2bdf256fad8b9d1cff809146ed"
+      "upstream_sha": "c005f35300ce76427dc285481ec5695f5b179cd2"
     },
     {
       "branch": "testing",
-      "expected_head": "ed28942eb768925b51bb24dc8a60ab92754fb68a",
-      "upstream_sha": "dfb80349bf5779ec0a3f834c9ec2794345bff8f0",
-      "expected_tree": "a42af6aec0d5c3192e3a4d57eb81fcfb638eecc7"
+      "expected_head": "5bf2633f335c99d1880aaaf8a474c1d96a35e88a",
+      "upstream_sha": "a6952ccf6907c18e18917fcb763a433e8e36937b"
     },
     {
       "branch": "unstable",
@@ -207,12 +206,6 @@
       "branch": "usbip",
       "expected_head": "226c9f22eec4212270f24e3af73de39473bec855",
       "upstream_sha": "226c9f22eec4212270f24e3af73de39473bec855"
-    },
-    {
-      "branch": "custom-dev",
-      "expected_head": "3caffa1d5eba125d6eaf048acb27addbc52ff91e",
-      "upstream_sha": "dfb80349bf5779ec0a3f834c9ec2794345bff8f0",
-      "expected_tree": "f5b1fcb59138f001bdffbaae3dbab70a0abd97d2"
     }
   ]
 }
