@@ -1,0 +1,29 @@
+name: Audit public core release bytes
+on:
+  push:
+    branches: [maintenance/custom-sync]
+    paths: ['.github/custom-sync/public-core-audit-request.json']
+permissions:
+  contents: read
+concurrency:
+  group: public-core-release-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.repository == 'csbxd/sing-box' && github.ref == 'refs/heads/maintenance/custom-sync'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify public assets without signing or write credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/custom-sync/public_core_audit.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: public-core-release-audit
+          path: public-core-audit-result.json
+          if-no-files-found: error
