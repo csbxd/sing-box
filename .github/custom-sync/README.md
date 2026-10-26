@@ -93,6 +93,25 @@ After Android sync and real owner signing setup, request its signed release usin
 exact Android source SHA and the verified custom-core release SHA. Never generate
 or transmit signing keys, publish unsigned/debug fallbacks, or use cross-repo tokens.
 
+## Reviewed alpha.13 compatibility — 2026-10-26
+
+The owner authorized automatic conflict resolution while preserving original
+functional commits, metadata, safety checks and independent review. For exact
+upstream `a6952ccf6907c18e18917fcb763a433e8e36937b`, the existing
+`box.go` fixture changes only the connection-manager constructor to pass `ctx`
+before the logger, preserving the upstream URL-test history context lookup.
+The new reviewed fixture blob is `96637873d3483fb3f0df30546093b09aca31e9ad`.
+Exact old/new upstream `box.go` differs only by this argument; the lifecycle
+interface blob remains unchanged. The original Go 1.27 HTTP/2 layout fix is not
+absorbed. All seven original replay commits remain in their original order,
+with exact author/date/full-message checks and binary-inclusive patch checks
+outside the already scoped `box.go` resolution.
+
+This review permits read-only candidate preparation, not unchecked publication.
+Require full core Go tests, SD/dialer and lifecycle race tests, exact replay
+audit and independently reviewed final tree before the live atomic request.
+Historical compatibility records below describe earlier exact upstream pins.
+
 ## Explicitly reviewed lifecycle compatibility
 
 The owner approved resolving the service-discovery conflict on 2026-10-05.

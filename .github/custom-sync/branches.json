@@ -188,12 +188,12 @@
         {
           "branch": "custom-dev",
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "upstream_sha": "dfb80349bf5779ec0a3f834c9ec2794345bff8f0",
+          "upstream_sha": "a6952ccf6907c18e18917fcb763a433e8e36937b",
           "files": [
             {
               "path": "box.go",
               "resolved_path": ".github/custom-sync/compatibility/box.go",
-              "blob_sha": "a4bef4f6ee8cacd3809f367c02b5a9bba98b8e0b"
+              "blob_sha": "96637873d3483fb3f0df30546093b09aca31e9ad"
             }
           ]
         }
