@@ -1,11 +1,16 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261026-custom-alpha13",
+  "request_id": "weekly-20261102-reviewed-candidates",
   "targets": [
     {
+      "branch": "testing",
+      "expected_head": "3fbd02971924c79c71ccaa6b4984bfe749fb0d3e",
+      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476"
+    },
+    {
       "branch": "custom-dev",
-      "expected_head": "032b3d6fe67203a50ca466e30fc9f2394e733352",
-      "upstream_sha": "a6952ccf6907c18e18917fcb763a433e8e36937b"
+      "expected_head": "26f24a45aaf18c45780ac3f40b686568b55e4508",
+      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476"
     }
   ]
 }
