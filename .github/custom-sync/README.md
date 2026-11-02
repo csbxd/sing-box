@@ -211,3 +211,19 @@ fresh request. No credential fallback, unleased force, or permission expansion
 is allowed. The proof establishes real Contents and workflow-file push rights
 for these isolated refs, not exemption from source-branch-specific rules, token
 expiry in the future, or revocation of a previously exposed credential.
+
+## Reviewed endpoint-flow upstream compatibility — 2026-11-02
+
+For exact upstream `e5d91fa79f6319d5de940d6c81d81f0fe53b9476`, independent review confirmed
+`box.go` and `adapter/lifecycle.go` are byte-identical to the previously reviewed
+`a6952ccf6907c18e18917fcb763a433e8e36937b` versions. The resolved fixture blob
+`96637873d3483fb3f0df30546093b09aca31e9ad` and all seven ordered original replay
+commits are unchanged. Only the exact upstream resolution pin advances.
+
+The upstream endpoint-to-TUN flow changes do not modify workflows. The original
+service-discovery MASQUE dialer hunks and upstream endpoint initialization/flow
+hunks are disjoint. New NetworkManager host-port methods are implemented by the
+upstream concrete route manager. This static review permits read-only candidate
+preparation only: require actual replay metadata/patch checks, full tagged Go
+tests, SD/dialer and lifecycle race tests, and independent exact-tree audit before
+submitting the atomic source synchronization request. No safety check is waived.
