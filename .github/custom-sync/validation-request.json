@@ -1,16 +1,21 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261102-reviewed-candidates",
+  "request_id": "weekly-20261109-reviewed-candidates",
   "targets": [
     {
+      "branch": "stable",
+      "expected_head": "921309beb55843a5a3a0d4133dbc1bfe60134663",
+      "upstream_sha": "ae581894971c2a4f26b59acd1bc0c4dd3b79e3fc"
+    },
+    {
       "branch": "testing",
-      "expected_head": "3fbd02971924c79c71ccaa6b4984bfe749fb0d3e",
-      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476"
+      "expected_head": "2d6f67a386a7a6b5140c40935c57e5bf7011192a",
+      "upstream_sha": "8295e4910f14d3041c948d2ad74bf3af384a064d"
     },
     {
       "branch": "custom-dev",
-      "expected_head": "26f24a45aaf18c45780ac3f40b686568b55e4508",
-      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476"
+      "expected_head": "512327bda499dae778f276286f295bc51d37e922",
+      "upstream_sha": "8295e4910f14d3041c948d2ad74bf3af384a064d"
     }
   ]
 }
