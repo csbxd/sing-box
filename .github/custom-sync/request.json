@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261102-reviewed-all",
+  "request_id": "weekly-20261111-restored-reviewed-all",
   "targets": [
     {
       "branch": "archive",
@@ -190,13 +190,14 @@
     {
       "branch": "stable",
       "expected_head": "921309beb55843a5a3a0d4133dbc1bfe60134663",
-      "upstream_sha": "c005f35300ce76427dc285481ec5695f5b179cd2"
+      "upstream_sha": "b33a1a5c6b8dacc4a38108eaed00bda0871d036b",
+      "expected_tree": "23067946d545bd786118d945fc06f3b4864b59a2"
     },
     {
       "branch": "testing",
-      "expected_head": "3fbd02971924c79c71ccaa6b4984bfe749fb0d3e",
-      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476",
-      "expected_tree": "ecd4ca4e79632979dae860b6928950a875c0ae8c"
+      "expected_head": "2d6f67a386a7a6b5140c40935c57e5bf7011192a",
+      "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+      "expected_tree": "6aef3270b6af3e1d466242d90fa1b0415b30d153"
     },
     {
       "branch": "unstable",
@@ -210,9 +211,9 @@
     },
     {
       "branch": "custom-dev",
-      "expected_head": "26f24a45aaf18c45780ac3f40b686568b55e4508",
-      "upstream_sha": "e5d91fa79f6319d5de940d6c81d81f0fe53b9476",
-      "expected_tree": "c22bd6bf957d8fa690081f938182036282e518d0"
+      "expected_head": "512327bda499dae778f276286f295bc51d37e922",
+      "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+      "expected_tree": "3ab061bfe339328c90ac79640cde980a9b99f264"
     }
   ]
 }
