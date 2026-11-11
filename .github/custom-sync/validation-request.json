@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261111-restored-reviewed-candidates",
+  "request_id": "weekly-20261111-reviewed-candidates-fixed-test",
   "targets": [
     {
       "branch": "stable",
@@ -18,7 +18,7 @@
       "branch": "custom-dev",
       "expected_head": "512327bda499dae778f276286f295bc51d37e922",
       "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
-      "expected_tree": "b0436475049a8657e57be536326e007ef827bb2d"
+      "expected_tree": "3ab061bfe339328c90ac79640cde980a9b99f264"
     }
   ]
 }
