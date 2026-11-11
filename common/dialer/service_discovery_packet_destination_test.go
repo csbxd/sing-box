@@ -35,7 +35,11 @@ func TestServiceDiscoveryPacketDestinationMapping(t *testing.T) {
 		require.False(t, address.IsValid(), "connection already accepts the logical destination")
 		require.NoError(t, conn.SetDeadline(time.Now().Add(5*time.Second)))
 		require.NoError(t, listener.SetDeadline(time.Now().Add(5*time.Second)))
-		_, err = conn.WriteTo([]byte("ping"), destination)
+		var writeDestination net.Addr = destination
+		if destination.IsIP() {
+			writeDestination = destination.UDPAddr()
+		}
+		_, err = conn.WriteTo([]byte("ping"), writeDestination)
 		require.NoError(t, err)
 		buffer := make([]byte, 64)
 		n, source, err := listener.ReadFrom(buffer)
