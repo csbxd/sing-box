@@ -182,13 +182,14 @@
         "db2b6633159d9ee2b5753174162e22c22296a95b",
         "74b80933b00712b40b2266985f3af8efbdf1ba6d",
         "03084bb02bc2fc2e628c4d047a482f1a127ac49d",
-        "2d09e27c9d3960211d31f0f2d39f8450912e06e9"
+        "2d09e27c9d3960211d31f0f2d39f8450912e06e9",
+        "70d54d9bfa367055cb1713c9cadc9ead3df9a565"
       ],
       "resolutions": [
         {
           "branch": "custom-dev",
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "upstream_sha": "8295e4910f14d3041c948d2ad74bf3af384a064d",
+          "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
           "files": [
             {
               "path": "box.go",
