@@ -268,20 +268,20 @@
     "stable": {
       "branch": "stable",
       "skip": false,
-      "upstream_sha": "b33a1a5c6b8dacc4a38108eaed00bda0871d036b",
+      "upstream_sha": "7c4ea11299a8aff03584fa3827b5bf016a8c7fd0",
       "replay_commits": [
         "cc9529990cca8510c2f14290e2c4d6950da03540",
         "a3821e4405e74660726c5b9337181ae2c5306652",
         "03084bb02bc2fc2e628c4d047a482f1a127ac49d"
       ],
-      "previous_head": "921309beb55843a5a3a0d4133dbc1bfe60134663",
-      "source_sha": "58170ec768803299ec9fc6b6d49becf8467237fb",
-      "source_tree": "23067946d545bd786118d945fc06f3b4864b59a2",
-      "source_fingerprint": "75b25cf33dd4f3a8cd847a3bdb884155626677a0e5ab81748132f0a882506b46",
+      "previous_head": "58170ec768803299ec9fc6b6d49becf8467237fb",
+      "source_sha": "d4d6fa4239066bfe6a239f1415f0ed390ccae408",
+      "source_tree": "066789031208692ec8f7b000c9db6351e15f86ba",
+      "source_fingerprint": "57f4c1f2209cc588972f172d90436594657e5a4725833a3554812d1de5d7737f",
       "mapping": [
         {
           "original": "cc9529990cca8510c2f14290e2c4d6950da03540",
-          "cherry_pick": "117534e6fc7048ffae0a784245b3a9d9df9e923e",
+          "cherry_pick": "602a4d9459e050f149965653dd2344a3b7584345",
           "patch_id": "72172a638405a878f1e012e0296bc6af46052c72",
           "original_patch_id": "72172a638405a878f1e012e0296bc6af46052c72",
           "metadata_sha256": "bb69d7af7b198c2c3caa4cb6e85f32e3ab25c34ba255d74003d7045f977d81bf",
@@ -290,7 +290,7 @@
         },
         {
           "original": "a3821e4405e74660726c5b9337181ae2c5306652",
-          "cherry_pick": "002105f65612422d2e787b1353379177abda51fe",
+          "cherry_pick": "e4051b6e4b2e5e4a314b9b55e241794c0df179c8",
           "patch_id": "b192c37ed8c204380c77c094d9470a61c6e93b3c",
           "original_patch_id": "b192c37ed8c204380c77c094d9470a61c6e93b3c",
           "metadata_sha256": "eebad59e8990e76897915d02610ec310d85efbce9c348dc14ee8fe80d3903a4f",
@@ -299,7 +299,7 @@
         },
         {
           "original": "03084bb02bc2fc2e628c4d047a482f1a127ac49d",
-          "cherry_pick": "58170ec768803299ec9fc6b6d49becf8467237fb",
+          "cherry_pick": "d4d6fa4239066bfe6a239f1415f0ed390ccae408",
           "patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "original_patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "metadata_sha256": "bea42ce00f906dcffbd19d895fc8a3d211b0b60911eecc6417be4d17e1fade80",
@@ -307,25 +307,25 @@
           "patch_equivalence": "exact"
         }
       ],
-      "backup_branch": "backup/sync-weekly-20261111-restored-reviewed-all/stable"
+      "backup_branch": "backup/sync-weekly-20261116-reviewed-all/stable"
     },
     "testing": {
       "branch": "testing",
       "skip": false,
-      "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+      "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207",
       "replay_commits": [
         "98a5602deeefd47125c056a0c616e547a7ea697a",
         "be4fdc3e20120d6021b85835eb420dfc350f50a6",
         "03084bb02bc2fc2e628c4d047a482f1a127ac49d"
       ],
-      "previous_head": "2d6f67a386a7a6b5140c40935c57e5bf7011192a",
-      "source_sha": "4c8847e96f05a1cefee9c4918a9fbfcc75425a47",
-      "source_tree": "6aef3270b6af3e1d466242d90fa1b0415b30d153",
-      "source_fingerprint": "e1d1d51adee1684e118e9f627ffa16be5b3a76db2a779d46aabff95038c680ae",
+      "previous_head": "4c8847e96f05a1cefee9c4918a9fbfcc75425a47",
+      "source_sha": "eb57ec654bedb2cd922f4d6ca4a8430afba44b99",
+      "source_tree": "ace27731ae38a2fc7c3d6052ad88eb7e44d71ab1",
+      "source_fingerprint": "185a080aab694f399516a70ab0a512e078da85aa20c86d1df3dcfdd5e8309d88",
       "mapping": [
         {
           "original": "98a5602deeefd47125c056a0c616e547a7ea697a",
-          "cherry_pick": "17194e4ad89e240b9cb85d02bbc32d259c66a0a5",
+          "cherry_pick": "57ef077dfc404faa673bd287ab77345c62b3b5c0",
           "patch_id": "72172a638405a878f1e012e0296bc6af46052c72",
           "original_patch_id": "72172a638405a878f1e012e0296bc6af46052c72",
           "metadata_sha256": "a2a238f3b683d08381f53dfb62c905c1d93b8d69dc17b0935a83f19ddb8b63f7",
@@ -334,7 +334,7 @@
         },
         {
           "original": "be4fdc3e20120d6021b85835eb420dfc350f50a6",
-          "cherry_pick": "5b8dfa06d6a97d2452a1b086cbf97ed53861cf27",
+          "cherry_pick": "88b63eac9474285cd8e1411943bbf9c11c9062f1",
           "patch_id": "b192c37ed8c204380c77c094d9470a61c6e93b3c",
           "original_patch_id": "b192c37ed8c204380c77c094d9470a61c6e93b3c",
           "metadata_sha256": "7c77f45a4d3c38dbe1c18264d12f23625acc2134bf78138a333b6c2bab75a88e",
@@ -343,7 +343,7 @@
         },
         {
           "original": "03084bb02bc2fc2e628c4d047a482f1a127ac49d",
-          "cherry_pick": "4c8847e96f05a1cefee9c4918a9fbfcc75425a47",
+          "cherry_pick": "eb57ec654bedb2cd922f4d6ca4a8430afba44b99",
           "patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "original_patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "metadata_sha256": "bea42ce00f906dcffbd19d895fc8a3d211b0b60911eecc6417be4d17e1fade80",
@@ -351,7 +351,7 @@
           "patch_equivalence": "exact"
         }
       ],
-      "backup_branch": "backup/sync-weekly-20261111-restored-reviewed-all/testing"
+      "backup_branch": "backup/sync-weekly-20261116-reviewed-all/testing"
     },
     "unstable": {
       "upstream_sha": "5b29fd3be47f204a331e3baa6bbac202bb4126ea",
@@ -370,7 +370,7 @@
     "custom-dev": {
       "branch": "custom-dev",
       "skip": false,
-      "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+      "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207",
       "replay_commits": [
         "bdfede69ea4cba6f654dd19ad90c2cb62f465be6",
         "8eedb38da3d5a7ab6c06356210c93301ed55d733",
@@ -382,14 +382,14 @@
         "70d54d9bfa367055cb1713c9cadc9ead3df9a565",
         "003f9aeb8896f8bf3be5ccb0ef34f2813860233d"
       ],
-      "previous_head": "512327bda499dae778f276286f295bc51d37e922",
-      "source_sha": "5978fa9253bb176be73d38d6b4411b3070dd7fed",
-      "source_tree": "3ab061bfe339328c90ac79640cde980a9b99f264",
-      "source_fingerprint": "3d0108dfe946cf06c10d32e4d0fb778958de9bd2369aee0f59b57cceb06e939f",
+      "previous_head": "6a6337db1a0214bc2aad73c42ae241f634398cdd",
+      "source_sha": "2decde7ac010271d216a7ba452080f78b2b44d7c",
+      "source_tree": "1957a9a7241dbec98364ced403132c55c0628769",
+      "source_fingerprint": "2f991088156b484df867b8c919d59b86be5beaa5a7186f05ff33b8dd76f98515",
       "mapping": [
         {
           "original": "bdfede69ea4cba6f654dd19ad90c2cb62f465be6",
-          "cherry_pick": "d625e5463c89d1ea3082f750859f6f278f0baf95",
+          "cherry_pick": "4cb2333b03cf71a2d6d6648fdbf37ee8d887dbd1",
           "patch_id": "914bcb8f98dac4f8cd382080530d4172a01695f9",
           "original_patch_id": "914bcb8f98dac4f8cd382080530d4172a01695f9",
           "metadata_sha256": "1f17ed9d95a0a04295665758ca0b81bffaafa7d97c5f1dc51bcc52184c6ff290",
@@ -398,7 +398,7 @@
         },
         {
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "cherry_pick": "8f9d4601990c9211eea61caf05cab3721bcf7a2b",
+          "cherry_pick": "2f8d6571082a35c122506ed55557e346973a3a83",
           "patch_id": "73aeba4f90ff8265e72d46687eb5a858ca7ec604",
           "original_patch_id": "ae9544bbb42bfe9a526a81a422b19881f3ba01e7",
           "metadata_sha256": "b5dece6017d1b3a86f7e2506a1ef22a2e271a0230823fb979836d0208c6d815d",
@@ -408,7 +408,7 @@
           "resolution": {
             "branch": "custom-dev",
             "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-            "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+            "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207",
             "files": [
               {
                 "path": "box.go",
@@ -420,7 +420,7 @@
         },
         {
           "original": "61a73e57fa2ab7407b5352b65c6843778c8b78d4",
-          "cherry_pick": "c87f15899717baa683a7ad4f85f7ad4c81ae4fdd",
+          "cherry_pick": "78059add41d09dd2b2fa369ca38f2183a4180d65",
           "patch_id": "92009d933bc42f4e4051f9c858f3ed0deeac1d74",
           "original_patch_id": "92009d933bc42f4e4051f9c858f3ed0deeac1d74",
           "metadata_sha256": "a1a5b854a7bcf5de074f5a94a079e38a2251e3780bf98406ed5af8d4f75c4ceb",
@@ -429,7 +429,7 @@
         },
         {
           "original": "db2b6633159d9ee2b5753174162e22c22296a95b",
-          "cherry_pick": "abd1d8223920f456b3f404e282dd835cc6cc5fb9",
+          "cherry_pick": "3dc8b9b7bbc540f7a24b9ba6d769277fa2ceb2db",
           "patch_id": "58393b51417d31e199a5221edb680893c8a3cff2",
           "original_patch_id": "58393b51417d31e199a5221edb680893c8a3cff2",
           "metadata_sha256": "3b4c2914917fec715a95ed5f5e1b0aa6d4c90e653f5a4aa626d740efd31c237e",
@@ -438,7 +438,7 @@
         },
         {
           "original": "74b80933b00712b40b2266985f3af8efbdf1ba6d",
-          "cherry_pick": "e45c8696ce40ca636fae217d90cb22468dd4ebb0",
+          "cherry_pick": "a51e62409198e1d05fe58d6d1d0e5a540b277ce6",
           "patch_id": "59bbdb529869901985e580a7f25d5750c31ca93f",
           "original_patch_id": "59bbdb529869901985e580a7f25d5750c31ca93f",
           "metadata_sha256": "687968fb178210ee0ce1843dbd60534998a8cdbd2161743d5def44b54d3b74da",
@@ -447,7 +447,7 @@
         },
         {
           "original": "03084bb02bc2fc2e628c4d047a482f1a127ac49d",
-          "cherry_pick": "daeb34e2c91fe85dd3e817095d691325f624a4fd",
+          "cherry_pick": "bf113c9bad04d397158ef4126f82ebb30f5536a8",
           "patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "original_patch_id": "2941ccd73f259e11f4c74cfe481325764c4c0dbc",
           "metadata_sha256": "bea42ce00f906dcffbd19d895fc8a3d211b0b60911eecc6417be4d17e1fade80",
@@ -456,7 +456,7 @@
         },
         {
           "original": "2d09e27c9d3960211d31f0f2d39f8450912e06e9",
-          "cherry_pick": "dca761aa4edf72a7a78f6f3b2c9940bbe22484f9",
+          "cherry_pick": "6d8944078f5dfe435165b788019e26d8a9b69ff2",
           "patch_id": "9dbe95d6cb3b4fdea8e2c78ba95d6dcf55d0aa20",
           "original_patch_id": "9dbe95d6cb3b4fdea8e2c78ba95d6dcf55d0aa20",
           "metadata_sha256": "dacb51ebc4fc475533407d81ed4deeb2c6a7e8534f5aa83ecd16aedde70bae01",
@@ -465,7 +465,7 @@
         },
         {
           "original": "70d54d9bfa367055cb1713c9cadc9ead3df9a565",
-          "cherry_pick": "baf467a7a14987fe9f137cc268e47086d89869aa",
+          "cherry_pick": "05eb91a47d76c8e2aadc58a7d520033c36b2f247",
           "patch_id": "97117468530075f2396ce7c9c343d013dd8d6dae",
           "original_patch_id": "97117468530075f2396ce7c9c343d013dd8d6dae",
           "metadata_sha256": "27703688efc2c7cc90a5aec6d4bcb68409696639d8297cef083ff2c1a89043a6",
@@ -474,7 +474,7 @@
         },
         {
           "original": "003f9aeb8896f8bf3be5ccb0ef34f2813860233d",
-          "cherry_pick": "5978fa9253bb176be73d38d6b4411b3070dd7fed",
+          "cherry_pick": "2decde7ac010271d216a7ba452080f78b2b44d7c",
           "patch_id": "81d3c11377892e66c38a09f968c6847b97acffd0",
           "original_patch_id": "81d3c11377892e66c38a09f968c6847b97acffd0",
           "metadata_sha256": "10b3ec786f2ec3d442fb06db0ad5ed16503695e2f4b0c3e76a182e3d92cb5a69",
@@ -482,7 +482,7 @@
           "patch_equivalence": "exact"
         }
       ],
-      "backup_branch": "backup/sync-weekly-20261111-restored-reviewed-all/custom-dev"
+      "backup_branch": "backup/sync-weekly-20261116-reviewed-all/custom-dev"
     }
   }
 }
