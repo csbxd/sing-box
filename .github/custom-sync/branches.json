@@ -190,7 +190,7 @@
         {
           "branch": "custom-dev",
           "original": "8eedb38da3d5a7ab6c06356210c93301ed55d733",
-          "upstream_sha": "a13dbe1f785f66c86acbf3985c33fdafea0cbfd6",
+          "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207",
           "files": [
             {
               "path": "box.go",
