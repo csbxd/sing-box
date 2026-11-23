@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "request_id": "weekly-20261116-public-core-c4",
-  "tag": "v1.15.0-alpha.13.c4",
-  "source_sha": "2decde7ac010271d216a7ba452080f78b2b44d7c",
-  "source_tree": "1957a9a7241dbec98364ced403132c55c0628769",
-  "source_fingerprint": "2f991088156b484df867b8c919d59b86be5beaa5a7186f05ff33b8dd76f98515"
+  "request_id": "weekly-20261123-public-core-c5",
+  "tag": "v1.15.0-alpha.13.c5",
+  "source_sha": "8c31bc2c8ca521d50d6422f6f7b71d3e84ed4b03",
+  "source_tree": "a115519ea2ce29270c9148d8bdfb0dd343c840b3",
+  "source_fingerprint": "b80af911860d69a720d9b18340d18bc35492cc84850b3e217ae5573447d1402f"
 }
