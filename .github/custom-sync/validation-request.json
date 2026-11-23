@@ -1,21 +1,21 @@
 {
   "schema": 2,
-  "request_id": "weekly-20261116-reviewed-candidate-v1",
+  "request_id": "weekly-20261123-reviewed-candidate-v1",
   "targets": [
     {
       "branch": "stable",
-      "expected_head": "58170ec768803299ec9fc6b6d49becf8467237fb",
-      "upstream_sha": "7c4ea11299a8aff03584fa3827b5bf016a8c7fd0"
+      "expected_head": "d4d6fa4239066bfe6a239f1415f0ed390ccae408",
+      "upstream_sha": "f0fbf236f83e78881bbb6b0ac23bd2075c601450"
     },
     {
       "branch": "testing",
-      "expected_head": "4c8847e96f05a1cefee9c4918a9fbfcc75425a47",
-      "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207"
+      "expected_head": "eb57ec654bedb2cd922f4d6ca4a8430afba44b99",
+      "upstream_sha": "039d829d20c7bfb963dd73113afa9f2d1f080a70"
     },
     {
       "branch": "custom-dev",
-      "expected_head": "6a6337db1a0214bc2aad73c42ae241f634398cdd",
-      "upstream_sha": "3cc357d1bd40a104cf4b2207e85ea8f3fd64c207"
+      "expected_head": "a483e1cf4d62eca10bbc2a99786694ac203c996e",
+      "upstream_sha": "039d829d20c7bfb963dd73113afa9f2d1f080a70"
     }
   ]
 }
